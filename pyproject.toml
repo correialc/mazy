@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "mazy"
+version = "0.1.0"
+description = "Just another maze generator and solver"
+authors = ["Leandro Correia <leandro.correia@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
