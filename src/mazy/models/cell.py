@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from enum import IntEnum, IntFlag, auto
 
 
-class CellRole(IntEnum):
+class Role(IntEnum):
     NONE = 0
     ENTRANCE = auto()
     EXIT = auto()
@@ -32,3 +33,12 @@ class Border(IntFlag):
     @property
     def intersection(self) -> bool:
         return self.bit_count() < 2
+
+
+@dataclass(frozen=True)
+class Cell:
+    index: int
+    row: int
+    col: int
+    border: Border = Border.EMPTY
+    role: Role = Role.NONE

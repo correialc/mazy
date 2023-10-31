@@ -1,7 +1,7 @@
 from typing import Sequence
 from pytest import fixture
 
-from mazy.models.cell import Border
+from mazy.models.cell import Border, Cell, Role
 
 
 @fixture
@@ -52,3 +52,9 @@ def test_cell_border_intersection(cell_borders: Sequence[Border]) -> None:
             assert border.intersection is True
         else:
             assert border.intersection is False
+
+
+def test_cell_default_values() -> None:
+    cell = Cell(index=0, row=0, col=0)
+    assert cell.border == Border.EMPTY
+    assert cell.role == Role.NONE
