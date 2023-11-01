@@ -1,7 +1,9 @@
 from typing import Sequence
+
+import pytest
 from pytest import fixture
 
-from mazy.models.cell import Border, Cell, Role
+from mazy.models.cell import Border, Cell, Role, Direction
 
 
 @fixture
@@ -57,6 +59,78 @@ def test_cell_border_intersection(cell_borders: Sequence[Border]) -> None:
 
 def test_cell_default_values() -> None:
     """Default values should be properly initialized."""
-    cell = Cell(row=0, col=0)
+    cell = Cell(row=0, col=1)
     assert cell.border == Border.EMPTY
     assert cell.role == Role.NONE
+
+
+@pytest.mark.parametrize(
+    ("direction", "expected_opposite"),
+    [
+        (Direction.NORTH, Direction.SOUTH),
+        (Direction.SOUTH, Direction.NORTH),
+        (Direction.EAST, Direction.WEST),
+        (Direction.WEST, Direction.EAST),
+    ],
+)
+def test_cell_opposite_direction(
+    direction: Direction,
+    expected_opposite: Direction,
+) -> None:
+    assert direction.opposite() == expected_opposite
+
+
+@pytest.mark.parametrize("bidirectional", [True, False])
+def test_cell_add_link_to(
+    bidirectional: bool,
+) -> None:
+    """ "Should link the current cell to another cell."""
+    cell1 = Cell(row=0, col=0)
+    cell2 = Cell(row=0, col=1)
+    cell1.link_to(cell2, Direction.NORTH, bidirectional=bidirectional)
+
+    assert cell1.neighbors[Direction.NORTH] == cell2
+
+    if bidirectional:
+        assert cell2.neighbors[Direction.SOUTH] == cell1
+    else:
+        assert len(cell2.neighbors) == 0
+
+
+def test_cell_add_link_default_bidirectional() -> None:
+    """Should link cells bidirectionally by default."""
+    cell1 = Cell(row=0, col=0)
+    cell2 = Cell(row=0, col=1)
+    cell1.link_to(cell2, Direction.NORTH)
+
+    assert cell1.neighbors[Direction.NORTH] == cell2
+    assert cell2.neighbors[Direction.SOUTH] == cell1
+
+
+@pytest.mark.parametrize("bidirectional", [True, False])
+def test_cell_remove_link(
+    bidirectional: bool,
+) -> None:
+    """Should unlink the current cell from another cell."""
+    cell1 = Cell(row=0, col=0)
+    cell2 = Cell(row=0, col=1)
+    cell1.link_to(cell2, Direction.NORTH, bidirectional=True)
+    cell1.unlink_from(cell2, Direction.NORTH, bidirectional=bidirectional)
+
+    assert cell2 not in cell1.neighbors.values()
+
+    if bidirectional:
+        assert cell1 not in cell2.neighbors.values()
+    else:
+        assert cell2.neighbors[Direction.SOUTH] == cell1
+
+
+def test_cell_remove_link_default_bidirectional() -> None:
+    """Should unlink cells bidirectionally by default."""
+    cell1 = Cell(row=0, col=0)
+    cell2 = Cell(row=0, col=0)
+    cell1.link_to(cell2, Direction.NORTH)
+    cell1.unlink_from(cell2, Direction.NORTH)
+
+    assert cell2 not in cell1.neighbors.values()
+    assert cell1 not in cell2.neighbors.values()
