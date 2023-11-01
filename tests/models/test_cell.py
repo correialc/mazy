@@ -47,6 +47,7 @@ def test_cell_border_dead_end(cell_borders: Sequence[Border]) -> None:
 
 
 def test_cell_border_intersection(cell_borders: Sequence[Border]) -> None:
+    """Intersections should not have more than 1 border."""
     for border in cell_borders:
         if border.bit_count() < 2:
             assert border.intersection is True
@@ -55,6 +56,7 @@ def test_cell_border_intersection(cell_borders: Sequence[Border]) -> None:
 
 
 def test_cell_default_values() -> None:
-    cell = Cell(index=0, row=0, col=0)
+    """Default values should be properly initialized."""
+    cell = Cell(row=0, col=0)
     assert cell.border == Border.EMPTY
     assert cell.role == Role.NONE

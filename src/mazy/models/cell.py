@@ -37,7 +37,6 @@ class Border(IntFlag):
 
 @dataclass(frozen=True)
 class Cell:
-    index: int
     row: int
     col: int
     border: Border = Border.EMPTY
