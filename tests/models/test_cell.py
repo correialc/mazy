@@ -28,6 +28,15 @@ def cell_borders() -> Sequence[Border]:
     ]
 
 
+def test_cell_border_square(cell_borders: Sequence[Border]) -> None:
+    """Square cells should have exactly 4 borders."""
+    for border in cell_borders:
+        if not border.bit_count() == 4:
+            assert border.is_square is False
+        else:
+            assert border.is_square is True
+
+
 def test_cell_border_corner(cell_borders: Sequence[Border]) -> None:
     """Corner cells should have exactly 2 consecutive borders."""
     for border in cell_borders:
@@ -35,33 +44,33 @@ def test_cell_border_corner(cell_borders: Sequence[Border]) -> None:
             Border.TOP | Border.BOTTOM,
             Border.LEFT | Border.RIGHT,
         ]:
-            assert border.corner is False
+            assert border.is_corner is False
         else:
-            assert border.corner is True
+            assert border.is_corner is True
 
 
 def test_cell_border_dead_end(cell_borders: Sequence[Border]) -> None:
     """Dead end cells should have exactly 3 borders."""
     for border in cell_borders:
         if border.bit_count() == 3:
-            assert border.dead_end is True
+            assert border.is_dead_end is True
         else:
-            assert border.dead_end is False
+            assert border.is_dead_end is False
 
 
 def test_cell_border_intersection(cell_borders: Sequence[Border]) -> None:
     """Intersections should not have more than 1 border."""
     for border in cell_borders:
         if border.bit_count() < 2:
-            assert border.intersection is True
+            assert border.is_intersection is True
         else:
-            assert border.intersection is False
+            assert border.is_intersection is False
 
 
 def test_cell_default_values() -> None:
     """Default values should be properly initialized."""
     cell = Cell(row=0, col=1)
-    assert cell.border == Border.EMPTY
+    assert cell.border.is_square
     assert cell.role == Role.NONE
 
 

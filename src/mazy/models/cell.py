@@ -21,7 +21,11 @@ class Border(IntFlag):
     RIGHT = auto()
 
     @property
-    def corner(self) -> bool:
+    def is_square(self) -> bool:
+        return self == cast(Border, self.TOP | self.LEFT | self.BOTTOM | self.RIGHT)
+
+    @property
+    def is_corner(self) -> bool:
         return self in (
             cast(Border, self.TOP | self.LEFT),
             cast(Border, self.TOP | self.RIGHT),
@@ -30,11 +34,11 @@ class Border(IntFlag):
         )
 
     @property
-    def dead_end(self) -> bool:
+    def is_dead_end(self) -> bool:
         return self.bit_count() == 3
 
     @property
-    def intersection(self) -> bool:
+    def is_intersection(self) -> bool:
         return self.bit_count() < 2
 
 
@@ -63,7 +67,9 @@ class Direction(Enum):
 class Cell:
     row: int
     col: int
-    border: Border = Border.EMPTY
+    border: Border = cast(
+        Border, Border.TOP | Border.LEFT | Border.BOTTOM | Border.RIGHT
+    )
     role: Role = Role.NONE
     neighbors: dict[Direction, "Cell"] = field(default_factory=dict)
 
