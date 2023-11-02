@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Optional
 
 import pytest
 from pytest import fixture
@@ -214,3 +214,20 @@ def test_cell_remove_link_raises_when_neighbor_doesnt_exist() -> None:
         match=r"There is no link between Cell\(row: 0, col: 0\) and Cell\(row: 0, col: 1\) \(east direction\).",
     ):
         cell1.unlink_from(cell2, Direction.EAST)
+
+
+@pytest.mark.parametrize(
+    ("cell", "other_cell", "direction", "expected_result"),
+    [
+        (Cell(row=0, col=0), Cell(row=0, col=1), Direction.EAST, True),
+        (Cell(row=0, col=0), Cell(row=0, col=1), None, False),
+    ],
+)
+def test_cell_is_linked(
+    cell: Cell, other_cell: Cell, direction: Optional[Direction], expected_result: bool
+) -> None:
+    """Should inform if there is a link between 2 cells."""
+    if direction:
+        cell.link_to(other_cell, direction)
+
+    assert cell.is_linked(other_cell) == expected_result

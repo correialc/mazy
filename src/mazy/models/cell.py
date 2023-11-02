@@ -111,6 +111,10 @@ class Cell:
         if bidirectional and other_cell.neighbors[direction.opposite()] == self:
             del other_cell.neighbors[direction.opposite()]
 
+    def is_linked(self, other_cell: "Cell") -> bool:
+        """Inform if 2 cells are linked (one is neighbor of the other)."""
+        return other_cell in self.neighbors.values()
+
 
 def is_neighborhood_valid(cell: Cell, neighbor: Cell, direction: Direction) -> bool:
     """Validate the neighborhood between 2 cells in a given direction.
