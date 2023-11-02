@@ -1,13 +1,12 @@
 from typing import Sequence, Optional
 
 import pytest
-from pytest import fixture
 
 from mazy.exceptions import NeighborhoodError, DuplicatedNeighbor, MissingLink
 from mazy.models.cell import Border, Cell, Role, Direction, is_neighborhood_valid
 
 
-@fixture
+@pytest.fixture
 def cell_borders() -> Sequence[Border]:
     return [
         Border.TOP,

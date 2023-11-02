@@ -67,9 +67,8 @@ class Direction(Enum):
 class Cell:
     row: int
     col: int
-    border: Border = cast(
-        Border, Border.TOP | Border.LEFT | Border.BOTTOM | Border.RIGHT
-    )
+
+    border: Border = Border.TOP | Border.LEFT | Border.BOTTOM | Border.RIGHT
     role: Role = Role.NONE
     neighbors: dict[Direction, "Cell"] = field(default_factory=dict)
 
