@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from enum import IntEnum, IntFlag, auto, Enum
+from typing import cast
 
 from mazy.exceptions import NeighborhoodError, DuplicatedNeighbor, MissingLink
 
@@ -22,10 +23,10 @@ class Border(IntFlag):
     @property
     def corner(self) -> bool:
         return self in (
-            self.TOP | self.LEFT,
-            self.TOP | self.RIGHT,
-            self.BOTTOM | self.LEFT,
-            self.BOTTOM | self.RIGHT,
+            cast(Border, self.TOP | self.LEFT),
+            cast(Border, self.TOP | self.RIGHT),
+            cast(Border, self.BOTTOM | self.LEFT),
+            cast(Border, self.BOTTOM | self.RIGHT),
         )
 
     @property
@@ -44,15 +45,18 @@ class Direction(Enum):
     WEST = "west"
 
     def opposite(self) -> "Direction":
+        direction: Direction
         match self:
             case self.NORTH:
-                return self.SOUTH
+                direction = self.SOUTH
             case self.SOUTH:
-                return self.NORTH
+                direction = self.NORTH
             case self.EAST:
-                return self.WEST
+                direction = self.WEST
             case self.WEST:
-                return self.EAST
+                direction = self.EAST
+
+        return direction
 
 
 @dataclass
@@ -63,7 +67,7 @@ class Cell:
     role: Role = Role.NONE
     neighbors: dict[Direction, "Cell"] = field(default_factory=dict)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Cell(row: {self.row}, col: {self.col})"
 
     def link_to(
