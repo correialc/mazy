@@ -123,12 +123,14 @@ def test_cell_add_link_to(
     """ "Should link the current cell to another cell."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
-    cell1.link_to(cell2, Direction.EAST, bidirectional=bidirectional)
+    cell1.link_to(
+        cell2, passage=False, direction=Direction.EAST, bidirectional=bidirectional
+    )
 
-    assert cell1.neighbors[Direction.EAST] == cell2
+    assert cell1.neighbors[Direction.EAST].cell == cell2
 
     if bidirectional:
-        assert cell2.neighbors[Direction.WEST] == cell1
+        assert cell2.neighbors[Direction.WEST].cell == cell1
     else:
         assert len(cell2.neighbors) == 0
 
@@ -137,29 +139,29 @@ def test_cell_add_link_default_bidirectional() -> None:
     """Should link cells bidirectionally by default."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
-    cell1.link_to(cell2, Direction.EAST)
+    cell1.link_to(cell2, passage=False, direction=Direction.EAST)
 
-    assert cell1.neighbors[Direction.EAST] == cell2
-    assert cell2.neighbors[Direction.WEST] == cell1
+    assert cell1.neighbors[Direction.EAST].cell == cell2
+    assert cell2.neighbors[Direction.WEST].cell == cell1
 
 
 def test_cell_add_link_validates_neighborhood() -> None:
-    """Should validate the neighborhood before linking 2 cells."""
+    """Should validate the cell row and col relative to the direction before linking."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
 
     with pytest.raises(
         NeighborhoodError,
-        match=r"The Cell\(row: 0, col: 1\) is not a valid neighbor on the north direction.",
+        match=r"Cell\(row: 0, col: 1\) position doesn't match the north direction.",
     ):
-        cell1.link_to(cell2, Direction.NORTH)
+        cell1.link_to(cell2, passage=False, direction=Direction.NORTH)
 
 
 def test_cell_add_link_doesnt_overwrite_neighbor() -> None:
     """Can not create a link if there is a neighbor on the given direction."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
-    cell1.link_to(cell2, Direction.EAST)
+    cell1.link_to(cell2, passage=False, direction=Direction.EAST)
 
     cell3 = Cell(row=0, col=1)
 
@@ -167,7 +169,7 @@ def test_cell_add_link_doesnt_overwrite_neighbor() -> None:
         DuplicatedNeighbor,
         match=r"The is already a neighbor for Cell\(row: 0, col: 0\) on the east direction.",
     ):
-        cell1.link_to(cell3, Direction.EAST)
+        cell1.link_to(cell3, passage=False, direction=Direction.EAST)
 
 
 @pytest.mark.parametrize("bidirectional", [True, False])
@@ -177,65 +179,70 @@ def test_cell_remove_link(
     """Should unlink the current cell from another cell."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
-    cell1.link_to(cell2, Direction.EAST, bidirectional=True)
+    cell1.link_to(cell2, passage=False, direction=Direction.EAST, bidirectional=True)
     cell1.unlink_from(cell2, Direction.EAST, bidirectional=bidirectional)
 
-    assert cell2 not in cell1.neighbors.values()
+    assert cell2 not in [neighbor.cell for neighbor in cell1.neighbors.values()]
 
     if bidirectional:
-        assert cell1 not in cell2.neighbors.values()
+        assert cell1 not in [neighbor.cell for neighbor in cell2.neighbors.values()]
     else:
-        assert cell2.neighbors[Direction.WEST] == cell1
+        assert cell2.neighbors[Direction.WEST].cell == cell1
 
 
 def test_cell_remove_link_default_bidirectional() -> None:
     """Should unlink cells bidirectionally by default."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
-    cell1.link_to(cell2, Direction.EAST)
+    cell1.link_to(cell2, passage=False, direction=Direction.EAST)
     cell1.unlink_from(cell2, Direction.EAST)
 
-    assert cell2 not in cell1.neighbors.values()
-    assert cell1 not in cell2.neighbors.values()
+    assert cell2 not in [neighbor.cell for neighbor in cell1.neighbors.values()]
+    assert cell1 not in [neighbor.cell for neighbor in cell2.neighbors.values()]
 
 
 def test_cell_remove_link_validates_neighborhood() -> None:
-    """Should validate the neighborhood before unlinking 2 cells."""
+    """Should validate the cell row and col relative to the direction before unlinking."""
     cell1 = Cell(row=1, col=0)
     cell2 = Cell(row=0, col=0)
-    cell1.link_to(cell2, Direction.NORTH)
+    cell1.link_to(cell2, passage=False, direction=Direction.NORTH)
 
     with pytest.raises(
         NeighborhoodError,
-        match=r"The Cell\(row: 0, col: 0\) is not a valid neighbor on the east direction.",
+        match=r"Cell\(row: 0, col: 0\) position doesn't match the east direction.",
     ):
         cell1.unlink_from(cell2, Direction.EAST)
 
 
-def test_cell_remove_link_raises_when_neighbor_doesnt_exist() -> None:
-    """Can not unlink 2 cells if there isn't a link between them."""
+def test_cell_remove_link_raises_when_link_doesnt_exist() -> None:
+    """Can not unlink 2 cells if there isn't a link on the given direction."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
 
     with pytest.raises(
         MissingLink,
-        match=r"There is no link between Cell\(row: 0, col: 0\) and Cell\(row: 0, col: 1\) \(east direction\).",
+        match=r"There is no link from Cell\(row: 0, col: 0\) to the east direction.",
     ):
         cell1.unlink_from(cell2, Direction.EAST)
 
 
 @pytest.mark.parametrize(
-    ("cell", "other_cell", "direction", "expected_result"),
+    ("cell", "other_cell", "direction", "passage", "expected_result"),
     [
-        (Cell(row=0, col=0), Cell(row=0, col=1), Direction.EAST, True),
-        (Cell(row=0, col=0), Cell(row=0, col=1), None, False),
+        (Cell(row=0, col=0), Cell(row=0, col=1), Direction.EAST, True, True),
+        (Cell(row=0, col=0), Cell(row=0, col=1), Direction.EAST, False, False),
+        (Cell(row=0, col=0), Cell(row=0, col=1), None, False, False),
     ],
 )
-def test_cell_is_linked(
-    cell: Cell, other_cell: Cell, direction: Optional[Direction], expected_result: bool
+def test_cell_has_passage(
+    cell: Cell,
+    other_cell: Cell,
+    direction: Optional[Direction],
+    passage: bool,
+    expected_result: bool,
 ) -> None:
-    """Should inform if there is a link between 2 cells."""
+    """Should inform if there is a passage between 2 cells."""
     if direction:
-        cell.link_to(other_cell, direction)
+        cell.link_to(other_cell, passage=passage, direction=direction)
 
-    assert cell.is_linked(other_cell) == expected_result
+    assert cell.has_passage(other_cell) == expected_result

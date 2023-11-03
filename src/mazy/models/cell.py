@@ -64,25 +64,35 @@ class Direction(Enum):
 
 
 @dataclass
+class Neighbor:
+    cell: "Cell"
+    passage: bool
+
+
+@dataclass
 class Cell:
     row: int
     col: int
 
     border: Border = Border.TOP | Border.LEFT | Border.BOTTOM | Border.RIGHT
     role: Role = Role.NONE
-    neighbors: dict[Direction, Optional["Cell"]] = field(default_factory=dict)
+    neighbors: dict[Direction, Neighbor] = field(default_factory=dict)
 
     def __repr__(self) -> str:
         return f"Cell(row: {self.row}, col: {self.col})"
 
     def link_to(
-        self, other_cell: "Cell", direction: Direction, bidirectional: bool = True
+        self,
+        other_cell: "Cell",
+        passage: bool,
+        direction: Direction,
+        bidirectional: bool = True,
     ) -> None:
         if not is_neighborhood_valid(
             cell=self, neighbor=other_cell, direction=direction
         ):
             raise NeighborhoodError(
-                f"The {other_cell} is not a valid neighbor on the {direction.value} direction."
+                f"{other_cell} position doesn't match the {direction.value} direction."
             )
 
         if self.neighbors.get(direction):
@@ -90,10 +100,12 @@ class Cell:
                 f"The is already a neighbor for {self} on the east direction."
             )
 
-        self.neighbors[direction] = other_cell
+        self.neighbors[direction] = Neighbor(cell=other_cell, passage=passage)
 
         if bidirectional:
-            other_cell.neighbors[direction.opposite()] = self
+            other_cell.neighbors[direction.opposite()] = Neighbor(
+                cell=self, passage=passage
+            )
 
     def unlink_from(
         self, other_cell: "Cell", direction: Direction, bidirectional: bool = True
@@ -102,23 +114,33 @@ class Cell:
             cell=self, neighbor=other_cell, direction=direction
         ):
             raise NeighborhoodError(
-                f"The {other_cell} is not a valid neighbor on the {direction.value} direction."
+                f"{other_cell} position doesn't match the {direction.value} direction."
             )
 
         if not self.neighbors.get(direction):
             raise MissingLink(
-                f"There is no link between {self} and {other_cell} (east direction)."
+                f"There is no link from {self} to the {direction.value} direction."
             )
 
-        if self.neighbors[direction] == other_cell:
-            del self.neighbors[direction]
+        del self.neighbors[direction]
 
-        if bidirectional and other_cell.neighbors[direction.opposite()] == self:
+        if bidirectional and other_cell.neighbors[direction.opposite()].cell == self:
             del other_cell.neighbors[direction.opposite()]
 
     def is_linked(self, other_cell: "Cell") -> bool:
         """Inform if 2 cells are linked (one is neighbor of the other)."""
-        return other_cell in self.neighbors.values()
+        return other_cell in [neighbor.cell for neighbor in self.neighbors.values()]
+
+    def has_passage(self, other_cell: "Cell") -> bool:
+        """Inform if there is a passage between 2 cells."""
+        if self.is_linked(other_cell):
+            return [
+                neighbor.passage
+                for neighbor in self.neighbors.values()
+                if neighbor.cell == other_cell
+            ].pop()
+
+        return False
 
 
 def is_neighborhood_valid(cell: Cell, neighbor: Cell, direction: Direction) -> bool:
