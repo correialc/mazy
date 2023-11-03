@@ -1,7 +1,5 @@
-from dataclasses import dataclass
 from enum import Enum
-from functools import cached_property
-from typing import Iterator
+from typing import Sequence
 
 from mazy.models.cell import Cell
 
@@ -16,8 +14,10 @@ class Maze:
         self.state = MazeState.BUILDING
         self.rows = rows
         self.cols = cols
-        self.cells = [[Cell(row, col) for col in range(cols)] for row in range(rows)]
+        self.cells: Sequence[Sequence[Cell]] = [
+            [Cell(row, col) for col in range(cols)] for row in range(rows)
+        ]
 
-    def __getitem__(self, index: tuple) -> Cell:
+    def __getitem__(self, index: tuple[int, int]) -> Cell:
         i, j = index
         return self.cells[i][j]

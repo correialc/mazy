@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import IntEnum, IntFlag, auto, Enum
-from typing import cast
+from typing import cast, Optional
 
 from mazy.exceptions import NeighborhoodError, DuplicatedNeighbor, MissingLink
 
@@ -70,7 +70,7 @@ class Cell:
 
     border: Border = Border.TOP | Border.LEFT | Border.BOTTOM | Border.RIGHT
     role: Role = Role.NONE
-    neighbors: dict[Direction, "Cell"] = field(default_factory=dict)
+    neighbors: dict[Direction, Optional["Cell"]] = field(default_factory=dict)
 
     def __repr__(self) -> str:
         return f"Cell(row: {self.row}, col: {self.col})"
