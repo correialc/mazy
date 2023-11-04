@@ -127,18 +127,29 @@ class Cell:
         if bidirectional and other_cell.neighbors[direction.opposite()].cell == self:
             del other_cell.neighbors[direction.opposite()]
 
-    def is_linked(self, other_cell: "Cell") -> bool:
+    def is_linked_to(self, other_cell: "Cell") -> bool:
         """Inform if 2 cells are linked (one is neighbor of the other)."""
         return other_cell in [neighbor.cell for neighbor in self.neighbors.values()]
 
-    def has_passage(self, other_cell: "Cell") -> bool:
+    def has_passage_to_cell(self, other_cell: "Cell") -> bool:
         """Inform if there is a passage between 2 cells."""
-        if self.is_linked(other_cell):
+        if self.is_linked_to(other_cell):
             return [
                 neighbor.passage
                 for neighbor in self.neighbors.values()
                 if neighbor.cell == other_cell
             ].pop()
+
+        return False
+
+    def has_link_to_direction(self, direction: Direction) -> bool:
+        """Inform if there is a link from the current cell to a given direction."""
+        return self.neighbors.get(direction) is not None
+
+    def has_passage_to_direction(self, direction: Direction) -> bool:
+        """Inform if there is a passage from the current cell to a given direction."""
+        if self.has_link_to_direction(direction):
+            return self.neighbors[direction].passage
 
         return False
 

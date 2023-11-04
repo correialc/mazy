@@ -227,6 +227,23 @@ def test_cell_remove_link_raises_when_link_doesnt_exist() -> None:
 
 
 @pytest.mark.parametrize(
+    ("cell", "other_cell", "direction", "expected_result"),
+    [
+        (Cell(row=0, col=0), Cell(row=0, col=1), Direction.EAST, True),
+        (Cell(row=0, col=0), Cell(row=0, col=1), None, False),
+    ],
+)
+def test_cell_is_linked_to(
+    cell: Cell, other_cell: Cell, direction: Optional[Direction], expected_result: bool
+) -> None:
+    """Should inform if there is a link between 2 cells."""
+    if direction:
+        cell.link_to(other_cell, passage=False, direction=direction)
+
+    assert cell.is_linked_to(other_cell) == expected_result
+
+
+@pytest.mark.parametrize(
     ("cell", "other_cell", "direction", "passage", "expected_result"),
     [
         (Cell(row=0, col=0), Cell(row=0, col=1), Direction.EAST, True, True),
@@ -234,7 +251,7 @@ def test_cell_remove_link_raises_when_link_doesnt_exist() -> None:
         (Cell(row=0, col=0), Cell(row=0, col=1), None, False, False),
     ],
 )
-def test_cell_has_passage(
+def test_cell_has_passage_to_cell(
     cell: Cell,
     other_cell: Cell,
     direction: Optional[Direction],
@@ -245,4 +262,35 @@ def test_cell_has_passage(
     if direction:
         cell.link_to(other_cell, passage=passage, direction=direction)
 
-    assert cell.has_passage(other_cell) == expected_result
+    assert cell.has_passage_to_cell(other_cell) == expected_result
+
+
+def test_cell_has_link_to_direction() -> None:
+    """Should inform if there is a link from the cell to a given direction."""
+    cell1 = Cell(row=0, col=0)
+    cell2 = Cell(row=0, col=1)
+    _ = Cell(row=1, col=0)
+
+    cell1.link_to(cell2, passage=False, direction=Direction.EAST)
+
+    assert cell1.has_link_to_direction(Direction.EAST) is True
+    assert cell1.has_link_to_direction(Direction.SOUTH) is False
+
+
+@pytest.mark.parametrize(
+    ("passage", "expected_result"),
+    [(True, True), (False, False)],
+)
+def test_cell_has_passage_to_direction(
+    passage: bool,
+    expected_result: bool,
+) -> None:
+    """Should inform if there is a passage from the cell to a given direction."""
+    cell1 = Cell(row=0, col=0)
+    cell2 = Cell(row=0, col=1)
+    _ = Cell(row=1, col=0)
+
+    cell1.link_to(cell2, passage=passage, direction=Direction.EAST)
+
+    assert cell1.has_passage_to_direction(Direction.EAST) == passage
+    assert cell1.has_passage_to_direction(Direction.SOUTH) is False
