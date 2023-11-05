@@ -153,6 +153,24 @@ class Cell:
 
         return False
 
+    def carve_passage_to_direction(self, direction: Direction) -> None:
+        """Set the passage flag on a given direction.
+
+        This operation is bidirectional.
+        """
+        if not self.has_link_to_direction(direction):
+            raise MissingLink(
+                f"There is no link from {self} to the {direction.value} direction."
+            )
+
+        neighbor = self.neighbors[direction]
+        neighbor.passage = True
+
+        other_cell = neighbor.cell
+
+        if other_cell.has_link_to_direction(direction.opposite()):
+            other_cell.neighbors[direction.opposite()].passage = True
+
 
 def is_neighborhood_valid(cell: Cell, neighbor: Cell, direction: Direction) -> bool:
     """Validate the neighborhood between 2 cells in a given direction.

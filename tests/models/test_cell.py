@@ -294,3 +294,30 @@ def test_cell_has_passage_to_direction(
 
     assert cell1.has_passage_to_direction(Direction.EAST) == passage
     assert cell1.has_passage_to_direction(Direction.SOUTH) is False
+
+
+def test_cell_carve_passage_to_direction() -> None:
+    """Should set passage flag to True in the given direction."""
+    cell = Cell(row=0, col=0)
+    other_cell = Cell(row=0, col=1)
+
+    cell.link_to(other_cell, passage=False, direction=Direction.EAST)
+
+    assert cell.has_passage_to_direction(Direction.EAST) is False
+    assert other_cell.has_passage_to_direction(Direction.WEST) is False
+
+    cell.carve_passage_to_direction(Direction.EAST)
+
+    assert cell.has_passage_to_direction(Direction.EAST) is True
+    assert other_cell.has_passage_to_direction(Direction.WEST) is True
+
+
+def test_cell_carve_passage_to_direction_raises_when_link_doesnt_exist() -> None:
+    """Can not carve a passage if there isn't a link on the given direction."""
+    cell = Cell(row=0, col=0)
+
+    with pytest.raises(
+        MissingLink,
+        match=r"There is no link from Cell\(row: 0, col: 0\) to the east direction.",
+    ):
+        cell.carve_passage_to_direction(Direction.EAST)
