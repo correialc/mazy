@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Sequence
+from typing import Sequence, Generator
 
 from mazy.models.cell import Cell, Role, Direction
 
@@ -40,3 +40,8 @@ class Maze:
                     cell.link_to(
                         self[row - 1, col], passage=False, direction=Direction.NORTH
                     )
+
+    def traverse_by_cell(self) -> Generator[Cell, None, None]:
+        for row in range(self.rows):
+            for col in range(self.cols):
+                yield self[row, col]

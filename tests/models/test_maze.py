@@ -1,6 +1,6 @@
 import pytest
 
-from mazy.models.cell import Role, Direction
+from mazy.models.cell import Role, Direction, Cell
 from mazy.models.maze import Maze, MazeState
 
 
@@ -64,12 +64,23 @@ def test_maze_registry_neighbors_creates_entrance_and_exit() -> None:
     assert exit_cell.role == Role.EXIT
 
     special_cells = [
-        maze[row, col].role
-        for row in range(maze.rows)
-        for col in range(maze.cols)
-        if maze[row, col].role in [Role.ENTRANCE, Role.EXIT]
+        cell.role
+        for cell in maze.traverse_by_cell()
+        if cell.role in [Role.ENTRANCE, Role.EXIT]
     ]
 
     assert Role.ENTRANCE in special_cells
     assert Role.EXIT in special_cells
     assert len(special_cells) == 2
+
+
+def test_maze_traverse_maze_by_cell() -> None:
+    """Should traverse the maze cell by cell."""
+    maze = Maze(2, 3)
+
+    iter_count = 0
+    for cell in maze.traverse_by_cell():
+        iter_count += 1
+        assert isinstance(cell, Cell)
+
+    assert iter_count == 6
