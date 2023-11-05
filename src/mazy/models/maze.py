@@ -24,12 +24,12 @@ class Maze:
         return self.cells[i][j]
 
     def registry_neighbors(self) -> None:
+        self[0, 0].role = Role.ENTRANCE
+        self[self.rows - 1, self.cols - 1].role = Role.EXIT
+
         for row in range(self.rows):
             for col in range(self.cols):
                 cell = self[row, col]
-
-                if cell.row == 0 and cell.col == 0:
-                    cell.role = Role.ENTRANCE
 
                 if not cell.col == 0:
                     cell.link_to(
