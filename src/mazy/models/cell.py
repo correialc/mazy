@@ -171,6 +171,16 @@ class Cell:
         if other_cell.has_link_to_direction(direction.opposite()):
             other_cell.neighbors[direction.opposite()].passage = True
 
+    def passage_count(self) -> int:
+        """Return current the number of passages for this cell."""
+        return len(
+            [
+                neighbor.passage
+                for neighbor in self.neighbors.values()
+                if neighbor.passage
+            ]
+        )
+
 
 def is_neighborhood_valid(cell: Cell, neighbor: Cell, direction: Direction) -> bool:
     """Validate the neighborhood between 2 cells in a given direction.

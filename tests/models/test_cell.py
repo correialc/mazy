@@ -321,3 +321,19 @@ def test_cell_carve_passage_to_direction_raises_when_link_doesnt_exist() -> None
         match=r"There is no link from Cell\(row: 0, col: 0\) to the east direction.",
     ):
         cell.carve_passage_to_direction(Direction.EAST)
+
+
+def test_cell_passage_count() -> None:
+    """Should return the current number of passages."""
+    cell = Cell(row=0, col=0)
+    assert cell.passage_count() == 0
+
+    cell_on_east = Cell(row=0, col=1)
+    cell.link_to(cell_on_east, passage=True, direction=Direction.EAST)
+
+    assert cell.passage_count() == 1
+
+    cell_on_south = Cell(row=1, col=0)
+    cell.link_to(cell_on_south, passage=True, direction=Direction.SOUTH)
+
+    assert cell.passage_count() == 2
