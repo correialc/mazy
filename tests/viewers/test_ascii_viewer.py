@@ -2,7 +2,7 @@ import pytest
 
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
 from mazy.utils import consume_generator
-from mazy.viewers.ascii_viewer import maze_to_str
+from mazy.viewers.ascii_viewer import MazeTextViewer
 
 ROW_SIZE = 2
 COL_SIZE = 5
@@ -15,7 +15,8 @@ def test_ascii_viewer_maze_to_maze(
 ) -> None:
     """Ensure the ASCII representation of the maze is consistent with the maze size."""
     maze = consume_generator(BinaryTreeBuilder().build_maze(rows, cols))
-    maze_str = maze_to_str(maze)
+    viewer = MazeTextViewer(maze)
+    maze_str = viewer.maze_to_str()
     str_rows = maze_str.split("\n")
     assert len(str_rows) == ROW_SIZE * rows + 1
 

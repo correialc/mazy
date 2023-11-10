@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
-from enum import IntEnum, IntFlag, auto, Enum
-from typing import cast, Optional
+from enum import Enum, IntEnum, auto
 
-from mazy.exceptions import NeighborhoodError, DuplicatedNeighbor, MissingLink
+from mazy.exceptions import DuplicatedNeighbor, MissingLink, NeighborhoodError
 
 
 class Role(IntEnum):
@@ -11,35 +10,6 @@ class Role(IntEnum):
     EXIT = auto()
     EXTERIOR = auto()
     WALL = auto()
-
-
-class Border(IntFlag):
-    EMPTY = 0
-    TOP = auto()
-    BOTTOM = auto()
-    LEFT = auto()
-    RIGHT = auto()
-
-    @property
-    def is_square(self) -> bool:
-        return self == cast(Border, self.TOP | self.LEFT | self.BOTTOM | self.RIGHT)
-
-    @property
-    def is_corner(self) -> bool:
-        return self in (
-            cast(Border, self.TOP | self.LEFT),
-            cast(Border, self.TOP | self.RIGHT),
-            cast(Border, self.BOTTOM | self.LEFT),
-            cast(Border, self.BOTTOM | self.RIGHT),
-        )
-
-    @property
-    def is_dead_end(self) -> bool:
-        return self.bit_count() == 3
-
-    @property
-    def is_intersection(self) -> bool:
-        return self.bit_count() < 2
 
 
 class Direction(Enum):
@@ -74,7 +44,6 @@ class Cell:
     row: int
     col: int
 
-    border: Border = Border.TOP | Border.LEFT | Border.BOTTOM | Border.RIGHT
     role: Role = Role.NONE
     neighbors: dict[Direction, Neighbor] = field(default_factory=dict)
 

@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Sequence, Generator
+from typing import Generator, Sequence
 
-from mazy.models.cell import Cell, Role, Direction
+from mazy.models.cell import Cell, Direction, Role
 
 
 class MazeState(Enum):

@@ -1,17 +1,12 @@
-from argparse import ArgumentError
-from typing import Optional
+from unittest.mock import Mock, patch
 
 import pytest
 from _pytest.capture import CaptureFixture
 from faker import Faker
 
-from mazy.maze_maker import (
-    validate_args,
-    make_maze,
-    DEFAULT_NUMBER_OF_ROWS,
-    DEFAULT_NUMBER_OF_COLS,
-    DEFAULT_MAZE_BUILDER,
-)
+from mazy.maze_maker import (DEFAULT_MAZE_BUILDER, DEFAULT_MAZE_VIEWER,
+                             DEFAULT_NUMBER_OF_COLS, DEFAULT_NUMBER_OF_ROWS,
+                             make_maze, validate_args)
 
 
 @pytest.mark.parametrize(
@@ -20,6 +15,7 @@ from mazy.maze_maker import (
         pytest.param("-r", "--rows", 20, id="Number of rows"),
         pytest.param("-c", "--cols", 30, id="Number of columns"),
         pytest.param("-b", "--builder", "binary-tree", id="Binary Tree Builder"),
+        pytest.param("-v", "--viewer", "graphical", id="Graphical Viewer"),
     ],
 )
 def test_maze_maker_validate_args(
@@ -41,6 +37,7 @@ def test_maze_maker_validate_args_without_args() -> None:
     assert getattr(args_namespace, "rows", None) == DEFAULT_NUMBER_OF_ROWS
     assert getattr(args_namespace, "cols", None) == DEFAULT_NUMBER_OF_COLS
     assert getattr(args_namespace, "builder", None) == DEFAULT_MAZE_BUILDER
+    assert getattr(args_namespace, "viewer", None) == DEFAULT_MAZE_VIEWER
 
 
 def test_maze_maker_validate_invalid_args(
@@ -61,23 +58,39 @@ def test_maze_maker_validate_invalid_args(
     )
 
 
-@pytest.mark.parametrize("args", [[], ["-r", "5", "-c", "8"]])
-def test_maze_maker_make_maze(
-    args: list[str],
+@patch("mazy.maze_maker.MazeGraphicalViewer")
+def test_maze_maker_make_maze_ascii_viewer(
+    maze_graphical_viewer_mock: Mock,
     capsys: CaptureFixture[str],
 ) -> None:
-    """Should validate args, make the maze and provide a valid output."""
-    args_namespace = validate_args(args)
+    """Should validate args, make the maze and show in ASCII mode."""
+    args_namespace = validate_args(["-r", "5", "-c", "8", "-v", "text"])
     make_maze(args_namespace)
     captured = capsys.readouterr()
 
-    expected_rows = args[1] if len(args) else DEFAULT_NUMBER_OF_ROWS
-    expected_cols = args[3] if len(args) else DEFAULT_NUMBER_OF_COLS
-
+    assert "Loading text viewer..."
     assert (
-        f"Building a {expected_rows}x{expected_cols} maze using {DEFAULT_MAZE_BUILDER} algorithm..."
-        in captured.out
+        f"Building a 5x8 maze using {DEFAULT_MAZE_BUILDER} algorithm..." in captured.out
     )
     assert "+    +----+" in captured.out
     assert "+----+    +" in captured.out
-    assert f"Maze created: {expected_rows}x{expected_cols}" in captured.out
+    assert "Maze created: 5x8" in captured.out
+    maze_graphical_viewer_mock.assert_not_called()
+
+
+@patch("mazy.maze_maker.MazeGraphicalViewer")
+def test_maze_maker_make_maze_graphical_viewer(
+    maze_graphical_viewer_mock: Mock,
+    capsys: CaptureFixture[str],
+) -> None:
+    """Should validate args, make the maze and show in graphical mode."""
+    args_namespace = validate_args(["-r", "5", "-c", "8", "-v", "graphical"])
+    make_maze(args_namespace)
+    captured = capsys.readouterr()
+
+    assert "Loading graphical viewer..."
+    assert (
+        f"Building a 5x8 maze using {DEFAULT_MAZE_BUILDER} algorithm..." in captured.out
+    )
+    assert "Maze created: 5x8" in captured.out
+    maze_graphical_viewer_mock.assert_called()

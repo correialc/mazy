@@ -4,7 +4,6 @@ from typing import Generator
 from mazy.models.cell import Direction
 from mazy.models.maze import Maze
 
-
 NAVIGATION_DIRECTIONS = [Direction.EAST, Direction.SOUTH]
 
 

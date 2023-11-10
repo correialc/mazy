@@ -1,5 +1,4 @@
-import random
-from typing import Protocol, Generator
+from typing import Generator, Protocol
 
 from mazy.models.maze import Maze
 
