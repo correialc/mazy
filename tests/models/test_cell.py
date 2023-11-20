@@ -1,75 +1,14 @@
-from typing import Sequence, Optional
+from typing import Optional
 
 import pytest
 
-from mazy.exceptions import NeighborhoodError, DuplicatedNeighbor, MissingLink
-from mazy.models.cell import Border, Cell, Role, Direction, is_neighborhood_valid
-
-
-@pytest.fixture
-def cell_borders() -> Sequence[Border]:
-    return [
-        Border.TOP,
-        Border.BOTTOM,
-        Border.LEFT,
-        Border.RIGHT,
-        Border.TOP | Border.LEFT,
-        Border.TOP | Border.RIGHT,
-        Border.BOTTOM | Border.LEFT,
-        Border.BOTTOM | Border.RIGHT,
-        Border.TOP | Border.BOTTOM,
-        Border.LEFT | Border.RIGHT,
-        Border.TOP | Border.BOTTOM | Border.LEFT,
-        Border.TOP | Border.BOTTOM | Border.RIGHT,
-        Border.TOP | Border.LEFT | Border.RIGHT,
-        Border.BOTTOM | Border.LEFT | Border.RIGHT,
-        Border.BOTTOM | Border.LEFT | Border.RIGHT | Border.LEFT,
-    ]
-
-
-def test_cell_border_square(cell_borders: Sequence[Border]) -> None:
-    """Square cells should have exactly 4 borders."""
-    for border in cell_borders:
-        if not border.bit_count() == 4:
-            assert border.is_square is False
-        else:
-            assert border.is_square is True
-
-
-def test_cell_border_corner(cell_borders: Sequence[Border]) -> None:
-    """Corner cells should have exactly 2 consecutive borders."""
-    for border in cell_borders:
-        if not border.bit_count() == 2 or border in [
-            Border.TOP | Border.BOTTOM,
-            Border.LEFT | Border.RIGHT,
-        ]:
-            assert border.is_corner is False
-        else:
-            assert border.is_corner is True
-
-
-def test_cell_border_dead_end(cell_borders: Sequence[Border]) -> None:
-    """Dead end cells should have exactly 3 borders."""
-    for border in cell_borders:
-        if border.bit_count() == 3:
-            assert border.is_dead_end is True
-        else:
-            assert border.is_dead_end is False
-
-
-def test_cell_border_intersection(cell_borders: Sequence[Border]) -> None:
-    """Intersections should not have more than 1 border."""
-    for border in cell_borders:
-        if border.bit_count() < 2:
-            assert border.is_intersection is True
-        else:
-            assert border.is_intersection is False
+from mazy.exceptions import DuplicatedNeighbor, MissingLink, NeighborhoodError
+from mazy.models.cell import Cell, Direction, Role, is_neighborhood_valid
 
 
 def test_cell_default_values() -> None:
     """Default values should be properly initialized."""
     cell = Cell(row=0, col=1)
-    assert cell.border.is_square
     assert cell.role == Role.NONE
 
 
@@ -120,7 +59,7 @@ def test_cell_validates_neighborhood(
 def test_cell_add_link_to(
     bidirectional: bool,
 ) -> None:
-    """ "Should link the current cell to another cell."""
+    """Should link the current cell to another cell."""
     cell1 = Cell(row=0, col=0)
     cell2 = Cell(row=0, col=1)
     cell1.link_to(
@@ -167,7 +106,8 @@ def test_cell_add_link_doesnt_overwrite_neighbor() -> None:
 
     with pytest.raises(
         DuplicatedNeighbor,
-        match=r"The is already a neighbor for Cell\(row: 0, col: 0\) on the east direction.",
+        match=r"The is already a neighbor for Cell\(row: 0, col: 0\) "
+        r"on the east direction.",
     ):
         cell1.link_to(cell3, passage=False, direction=Direction.EAST)
 
@@ -202,7 +142,7 @@ def test_cell_remove_link_default_bidirectional() -> None:
 
 
 def test_cell_remove_link_validates_neighborhood() -> None:
-    """Should validate the cell row and col relative to the direction before unlinking."""
+    """Should validate cell row and col before unlinking from the direction."""
     cell1 = Cell(row=1, col=0)
     cell2 = Cell(row=0, col=0)
     cell1.link_to(cell2, passage=False, direction=Direction.NORTH)

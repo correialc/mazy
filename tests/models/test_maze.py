@@ -1,6 +1,4 @@
-import pytest
-
-from mazy.models.cell import Role, Direction, Cell
+from mazy.models.cell import Cell, Direction, Role
 from mazy.models.maze import Maze, MazeState
 
 

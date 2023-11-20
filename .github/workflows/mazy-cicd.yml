@@ -28,6 +28,12 @@ jobs:
     - name: Typing check with mypy
       run: |
         poetry run mypy --strict .
+    - name: Linting with flake8
+      run: |
+        poetry run flake8 .
+    - name: Checking imports with isort
+      run: |
+        poetry run isort ./src ./tests -c -v
     - name: Test with pytest
       run: |
         poetry run pytest

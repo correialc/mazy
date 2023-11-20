@@ -1,7 +1,4 @@
-from typing import Generator
-
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
-from mazy.models.maze import Maze
 from mazy.utils import consume_generator
 
 

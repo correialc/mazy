@@ -5,13 +5,16 @@ from typing import Optional, Sequence
 
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
 from mazy.utils import consume_generator
-from mazy.viewers.ascii_viewer import maze_to_str
+from mazy.viewers.ascii_viewer import MazeTextViewer
+from mazy.viewers.base_viewer import MazeViewer
+from mazy.viewers.graphical_viewer import MazeGraphicalViewer
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_NUMBER_OF_ROWS = 3
 DEFAULT_NUMBER_OF_COLS = 4
 DEFAULT_MAZE_BUILDER = "binary-tree"
+DEFAULT_MAZE_VIEWER = "graphical"
 
 
 def validate_args(args: Optional[Sequence[str]] = None) -> Namespace:
@@ -38,20 +41,37 @@ def validate_args(args: Optional[Sequence[str]] = None) -> Namespace:
         default=DEFAULT_MAZE_BUILDER,
         help=f"Algorithm for maze building (default: {DEFAULT_MAZE_BUILDER}",
     )
+    parser.add_argument(
+        "-v",
+        "--viewer",
+        type=str,
+        default=DEFAULT_MAZE_VIEWER,
+        help=f"Maze Viewer (default: {DEFAULT_MAZE_VIEWER}",
+    )
     return parser.parse_args(args)
 
 
 def make_maze(args_namespace: Namespace) -> None:
     """Make the maze and output results."""
+    print(f"Loading {DEFAULT_MAZE_VIEWER} viewer...")
     print(
-        f"Building a {args_namespace.rows}x{args_namespace.cols} maze using {args_namespace.builder} algorithm..."
+        f"Building a {args_namespace.rows}x{args_namespace.cols} maze "
+        f"using {args_namespace.builder} algorithm..."
     )
     maze = consume_generator(
         BinaryTreeBuilder().build_maze(
             rows=args_namespace.rows, cols=args_namespace.cols
         )
     )
-    print(maze_to_str(maze))
+
+    viewer: MazeViewer
+    match args_namespace.viewer:
+        case "text":
+            viewer = MazeTextViewer(maze)
+        case _:
+            viewer = MazeGraphicalViewer(maze)
+
+    viewer.show_maze()
     print(f"Maze created: {maze.rows}x{maze.cols}")
 
 
