@@ -1,3 +1,4 @@
+"""Utility functions for general use."""
 from typing import Generator, TypeVar
 
 T = TypeVar("T")

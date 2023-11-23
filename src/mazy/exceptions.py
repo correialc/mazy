@@ -1,3 +1,6 @@
+"""Exceptions."""
+
+
 class NeighborhoodError(Exception):
     """Consistence error between cells and directions."""
 

@@ -1,3 +1,4 @@
+"""Tests for the maze model."""
 from mazy.models.cell import Cell, Direction, Role
 from mazy.models.maze import Maze, MazeState
 

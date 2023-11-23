@@ -1,3 +1,4 @@
+"""Tests for the cell model."""
 from typing import Optional
 
 import pytest
@@ -25,6 +26,7 @@ def test_cell_opposite_direction(
     direction: Direction,
     expected_opposite: Direction,
 ) -> None:
+    """Should return the opposite of a given direction."""
     assert direction.opposite() == expected_opposite
 
 

@@ -1,13 +1,17 @@
+"""Text viewer."""
 from mazy.models.cell import Direction, Role
 from mazy.models.maze import Maze
 from mazy.viewers.base_viewer import MazeViewer
 
 
 class MazeTextViewer(MazeViewer):
+    """Text viewer."""
+
     def __init__(self, maze: Maze) -> None:
         self.maze = maze
 
     def show_maze(self) -> None:
+        """Print a text representation of the maze."""
         print(self.maze_to_str())
 
     def maze_to_str(self) -> str:

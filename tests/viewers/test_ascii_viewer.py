@@ -1,3 +1,4 @@
+"""Tests for the text (ASCII) viewer."""
 import pytest
 
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder

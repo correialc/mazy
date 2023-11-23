@@ -1,9 +1,14 @@
+"""Tests for the graphical viewer."""
 from unittest.mock import Mock, patch
 
 from mazy.models.maze import Maze
-from mazy.viewers.graphical_viewer import (CELL_SIZE, EXTERNAL_SIZE,
-                                           MazeGraphicalProcessor,
-                                           MazeGraphicalViewer, Wall)
+from mazy.viewers.graphical_viewer import (
+    CELL_SIZE,
+    EXTERNAL_SIZE,
+    MazeGraphicalProcessor,
+    MazeGraphicalViewer,
+    Wall,
+)
 
 
 @patch("mazy.viewers.graphical_viewer.MazeGraphicalRenderer")
@@ -17,6 +22,11 @@ def test_graphical_viewer_calls_graphical_renderer(
 
 
 def test_graphical_processor_process_entrance_and_exit() -> None:
+    """Should not draw a border neither for the ENTRANCE nor for the EXIT.
+
+    The entrance can not have a border on the NORTH.
+    The EXIT can not have a border on the SOUTH.
+    """
     maze = Maze(2, 2)
     processor = MazeGraphicalProcessor(maze)
     walls = processor.process_walls(maze[0, 0])
@@ -45,6 +55,7 @@ def test_graphical_processor_process_entrance_and_exit() -> None:
 
 
 def test_graphical_processor_process_external_walls() -> None:
+    """Must draw all the external walls except for the entrance and the exit."""
     maze = Maze(2, 3)
     processor = MazeGraphicalProcessor(maze)
 

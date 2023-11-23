@@ -1,4 +1,4 @@
-name: Python application
+name: Mazy CICD pipeline
 
 on:
   push:
@@ -28,12 +28,10 @@ jobs:
     - name: Typing check with mypy
       run: |
         poetry run mypy --strict .
-    - name: Linting with flake8
+    - name: Lint and format checks with ruff
       run: |
-        poetry run flake8 .
-    - name: Checking imports with isort
-      run: |
-        poetry run isort ./src ./tests -c -v
+        poetry run ruff check .
+        poetry run ruff format . --check
     - name: Test with pytest
       run: |
         poetry run pytest
