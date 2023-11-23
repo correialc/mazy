@@ -1,3 +1,4 @@
+"""Graphical viewer."""
 from dataclasses import dataclass
 from typing import Generator
 
@@ -17,6 +18,12 @@ EXTERNAL_SIZE = 32
 
 @dataclass
 class Wall:
+    """Primitive coordinates of a wall.
+
+    In fact, a wall is a line representing the border
+    of a cell.
+    """
+
     x1: int
     y1: int
     x2: int
@@ -24,10 +31,13 @@ class Wall:
 
 
 class MazeGraphicalViewer(MazeViewer):
+    """Graphical viewer."""
+
     def __init__(self, maze: Maze) -> None:
         self.maze = maze
 
     def show_maze(self) -> None:
+        """Render and show the graphical representation of the maze."""
         processor = MazeGraphicalProcessor(self.maze)
         gui = MazeGraphicalRenderer(
             rows=self.maze.rows, cols=self.maze.cols, processor=processor
@@ -36,6 +46,8 @@ class MazeGraphicalViewer(MazeViewer):
 
 
 class MazeGraphicalProcessor:
+    """Process graphical information of the maze."""
+
     def __init__(self, maze: Maze):
         self.maze = maze
 
@@ -45,6 +57,7 @@ class MazeGraphicalProcessor:
         return self.maze.rows * CELL_SIZE + EXTERNAL_SIZE - 1
 
     def process_walls(self, cell: Cell) -> list[Wall]:
+        """Calculate primitive coordinates of the maze walls."""
         x1 = EXTERNAL_SIZE + cell.col * CELL_SIZE
         y1 = self.delta_y - cell.row * CELL_SIZE
 
@@ -86,12 +99,19 @@ class MazeGraphicalProcessor:
         return walls
 
     def process_maze(self) -> Generator[Wall, None, None]:
+        """Traverse the maze processing graphical information cell by cell."""
         for cell in self.maze.traverse_by_cell():
             for wall in self.process_walls(cell):
                 yield wall
 
 
 class MazeGraphicalRenderer(Window):
+    """Arcade graphical renderer.
+
+    Extends Arcade Window object, drawing a window with
+    a canvas for the maze graphical representation.
+    """
+
     def __init__(self, rows: int, cols: int, processor: MazeGraphicalProcessor):
         self.processor = processor
 
@@ -103,6 +123,7 @@ class MazeGraphicalRenderer(Window):
         set_background_color(BACKGROUND_COLOR)
 
     def on_draw(self) -> None:
+        """Render all objects for the active window."""
         self.clear()
 
         for wall in self.processor.process_maze():

@@ -1,3 +1,4 @@
+"""Definitions related to a maze."""
 from enum import Enum
 from typing import Generator, Sequence
 
@@ -5,11 +6,15 @@ from mazy.models.cell import Cell, Direction, Role
 
 
 class MazeState(Enum):
+    """Possible states of a maze."""
+
     BUILDING = "building"
     READY = "ready"
 
 
 class Maze:
+    """Maze as a grid of cells."""
+
     def __init__(self, rows: int, cols: int):
         self.state = MazeState.BUILDING
         self.rows = rows
@@ -24,6 +29,11 @@ class Maze:
         return self.cells[i][j]
 
     def registry_neighbors(self) -> None:
+        """Registry all neighbors.
+
+        The external cell have no neighbors at the maze frontiers.
+        The maze have no passages at this moment.
+        """
         self[0, 0].role = Role.ENTRANCE
         self[self.rows - 1, self.cols - 1].role = Role.EXIT
 
@@ -42,6 +52,7 @@ class Maze:
                     )
 
     def traverse_by_cell(self) -> Generator[Cell, None, None]:
+        """Traverse the maze cell by cell."""
         for row in range(self.rows):
             for col in range(self.cols):
                 yield self[row, col]

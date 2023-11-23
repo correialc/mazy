@@ -1,12 +1,18 @@
+"""Tests for the command line CLI."""
 from unittest.mock import Mock, patch
 
 import pytest
 from _pytest.capture import CaptureFixture
 from faker import Faker
 
-from mazy.maze_maker import (DEFAULT_MAZE_BUILDER, DEFAULT_MAZE_VIEWER,
-                             DEFAULT_NUMBER_OF_COLS, DEFAULT_NUMBER_OF_ROWS,
-                             make_maze, validate_args)
+from mazy.maze_maker import (
+    DEFAULT_MAZE_BUILDER,
+    DEFAULT_MAZE_VIEWER,
+    DEFAULT_NUMBER_OF_COLS,
+    DEFAULT_NUMBER_OF_ROWS,
+    make_maze,
+    validate_args,
+)
 
 
 @pytest.mark.parametrize(

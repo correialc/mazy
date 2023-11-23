@@ -1,3 +1,4 @@
+"""Binary Tree Maze builder."""
 import random
 from typing import Generator
 
@@ -8,8 +9,11 @@ NAVIGATION_DIRECTIONS = [Direction.EAST, Direction.SOUTH]
 
 
 class BinaryTreeBuilder:
+    """Binary Tree Maze builder."""
+
     @staticmethod
     def build_maze(rows: int, cols: int) -> Generator[Maze, None, None]:
+        """Build a maze using Binary Tree algorithm."""
         maze = Maze(rows, cols)
 
         for cell in maze.traverse_by_cell():

@@ -1,3 +1,4 @@
+"""Tests for the binary tree builder."""
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
 from mazy.utils import consume_generator
 

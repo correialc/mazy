@@ -1,3 +1,4 @@
+"""Definitions related to a cell."""
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum, auto
 
@@ -5,6 +6,8 @@ from mazy.exceptions import DuplicatedNeighbor, MissingLink, NeighborhoodError
 
 
 class Role(IntEnum):
+    """Possible roles for a cell."""
+
     NONE = 0
     ENTRANCE = auto()
     EXIT = auto()
@@ -13,12 +16,15 @@ class Role(IntEnum):
 
 
 class Direction(Enum):
+    """Directions relative to the current cell."""
+
     NORTH = "north"
     SOUTH = "south"
     EAST = "east"
     WEST = "west"
 
     def opposite(self) -> "Direction":
+        """The opposite direction relative to the current one."""
         direction: Direction
         match self:
             case self.NORTH:
@@ -35,12 +41,20 @@ class Direction(Enum):
 
 @dataclass
 class Neighbor:
+    """Cell linked to another cell in one direction.
+
+    When a cell is next to the other in one direction, it is
+    stored as a neighbor. A neigh can have or not a passage.
+    """
+
     cell: "Cell"
     passage: bool
 
 
 @dataclass
 class Cell:
+    """Basic building block of a maze."""
+
     row: int
     col: int
 
@@ -48,6 +62,7 @@ class Cell:
     neighbors: dict[Direction, Neighbor] = field(default_factory=dict)
 
     def __repr__(self) -> str:
+        """Text representation of a Cell object."""
         return f"Cell(row: {self.row}, col: {self.col})"
 
     def link_to(
@@ -57,6 +72,7 @@ class Cell:
         direction: Direction,
         bidirectional: bool = True,
     ) -> None:
+        """Link one cell to another creating a neighbor."""
         if not is_neighborhood_valid(
             cell=self, neighbor=other_cell, direction=direction
         ):
@@ -79,6 +95,7 @@ class Cell:
     def unlink_from(
         self, other_cell: "Cell", direction: Direction, bidirectional: bool = True
     ) -> None:
+        """Unlink one cell from the other removing a neighbor."""
         if not is_neighborhood_valid(
             cell=self, neighbor=other_cell, direction=direction
         ):
