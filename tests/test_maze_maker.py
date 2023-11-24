@@ -37,6 +37,25 @@ def test_maze_maker_validate_args(
     assert getattr(args_namespace, arg_name.lstrip("-"), None) == arg_value
 
 
+@pytest.mark.parametrize(
+    ("arg_short_name", "arg_name", "arg_value"),
+    [
+        pytest.param("-a", "--animated", True, id="Animated Building"),
+    ],
+)
+def test_maze_maker_validate_flag_args(
+    arg_short_name: str,
+    arg_name: str,
+    arg_value: str,
+) -> None:
+    """Should parse the provided flag args (short and long)."""
+    args_namespace = validate_args([arg_name])
+    assert getattr(args_namespace, arg_name.lstrip("-"), None) == arg_value
+
+    args_namespace = validate_args([arg_short_name])
+    assert getattr(args_namespace, arg_name.lstrip("-"), None) == arg_value
+
+
 def test_maze_maker_validate_args_without_args() -> None:
     """Should the default values for all args."""
     args_namespace = validate_args([])
@@ -44,6 +63,7 @@ def test_maze_maker_validate_args_without_args() -> None:
     assert getattr(args_namespace, "cols", None) == DEFAULT_NUMBER_OF_COLS
     assert getattr(args_namespace, "builder", None) == DEFAULT_MAZE_BUILDER
     assert getattr(args_namespace, "viewer", None) == DEFAULT_MAZE_VIEWER
+    assert getattr(args_namespace, "animated", None) is False
 
 
 def test_maze_maker_validate_invalid_args(
@@ -80,7 +100,8 @@ def test_maze_maker_make_maze_ascii_viewer(
     )
     assert "+    +----+" in captured.out
     assert "+----+    +" in captured.out
-    assert "Maze created: 5x8" in captured.out
+    assert "Text viewer loaded." in captured.out
+    assert "Maze created." in captured.out
     maze_graphical_viewer_mock.assert_not_called()
 
 
@@ -98,5 +119,6 @@ def test_maze_maker_make_maze_graphical_viewer(
     assert (
         f"Building a 5x8 maze using {DEFAULT_MAZE_BUILDER} algorithm..." in captured.out
     )
-    assert "Maze created: 5x8" in captured.out
+    assert "Graphical viewer loaded." in captured.out
+    assert "Maze created." in captured.out
     maze_graphical_viewer_mock.assert_called()
