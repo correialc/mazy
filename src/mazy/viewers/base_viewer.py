@@ -1,14 +1,14 @@
-"""Contract for maze viewers."""
+"""Contracts for maze viewers."""
 from abc import abstractmethod
 from typing import Protocol
 
-from mazy.models.maze import Maze
+from mazy.builders.base_builder import MazeBuilder
 
 
 class MazeViewer(Protocol):
     """Contract for maze viewers."""
 
-    maze: Maze
+    maze_builder: MazeBuilder
 
     @abstractmethod
     def show_maze(self) -> None:

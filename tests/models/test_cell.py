@@ -11,6 +11,7 @@ def test_cell_default_values() -> None:
     """Default values should be properly initialized."""
     cell = Cell(row=0, col=1)
     assert cell.role == Role.NONE
+    assert cell.visited is False
 
 
 @pytest.mark.parametrize(
