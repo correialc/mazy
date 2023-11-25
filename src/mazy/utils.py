@@ -1,5 +1,5 @@
 """Utility functions for general use."""
-from typing import Generator, TypeVar, Optional
+from typing import Generator, Optional, TypeVar
 
 T = TypeVar("T")
 

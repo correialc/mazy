@@ -1,12 +1,11 @@
 """Tests for the graphical viewer."""
 from unittest.mock import Mock, patch
 
+import pytest
+
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
 from mazy.models.maze import MazeState
-from mazy.viewers.graphical_viewer import (
-    MazeGraphicalProcessor,
-    MazeGraphicalViewer,
-)
+from mazy.viewers.graphical_viewer import MazeGraphicalProcessor, MazeGraphicalViewer
 
 
 @patch("mazy.viewers.graphical_viewer.MazeGraphicalRenderer")
@@ -39,3 +38,23 @@ def test_graphical_processor_animated() -> None:
         processor.process_maze()
 
     assert processor.maze.state == MazeState.READY  # type: ignore[comparison-overlap]
+
+
+@pytest.mark.parametrize(("rows", "cols", "expected_centers"), [(2, 2, 3), (2, 3, 5)])
+def test_graphical_processor_process_maze(
+    rows: int,
+    cols: int,
+    expected_centers: int,
+) -> None:
+    """Should return a list of cell coordinate points."""
+    builder = BinaryTreeBuilder(rows=rows, cols=cols)
+    processor = MazeGraphicalProcessor(builder, animated=True)
+    border_points, center_points = processor.process_maze()
+
+    assert len(border_points) > 0
+    assert len(center_points) == expected_centers  # Only the the first cell visited
+
+    for _ in range(rows * cols):
+        border_points, center_points = processor.process_maze()
+
+    assert len(center_points) == 0  # All cell visited

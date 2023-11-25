@@ -25,6 +25,7 @@ class BinaryTreeBuilder(MazeBuilder):
                 target_direction: Direction = random.choice(choices)
                 cell.carve_passage_to_direction(target_direction)
 
+            cell.visited = True
             yield self.maze
 
         self.maze.state = MazeState.READY

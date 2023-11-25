@@ -59,6 +59,7 @@ class Cell:
     col: int
 
     role: Role = Role.NONE
+    visited: bool = False
     neighbors: dict[Direction, Neighbor] = field(default_factory=dict)
 
     def __repr__(self) -> str:
