@@ -1,8 +1,6 @@
 """Graphical viewer."""
-import timeit
 from collections import namedtuple
-from dataclasses import dataclass
-from typing import Any, Generator, NamedTuple, Optional
+from typing import Any, Generator
 
 from arcade import (
     Shape,
@@ -11,9 +9,6 @@ from arcade import (
     color,
     create_lines,
     create_rectangle,
-    create_rectangles_filled_with_colors,
-    draw_line,
-    draw_text,
     set_background_color,
 )
 
@@ -169,8 +164,8 @@ class MazeGraphicalRenderer(Window):
                 create_rectangle(
                     center_x=center.x,
                     center_y=center.y,
-                    width=CELL_SIZE,
-                    height=CELL_SIZE,
+                    width=CELL_SIZE // 2,
+                    height=CELL_SIZE // 2,
                     color=UNVISITED_CELL_COLOR,
                 )
             )
