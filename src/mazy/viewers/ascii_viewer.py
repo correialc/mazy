@@ -10,6 +10,7 @@ class MazeTextViewer(MazeViewer):
 
     def __init__(self, maze_builder: MazeBuilder) -> None:
         self.maze_builder = maze_builder
+        self.name = "text"
 
     def show_maze(self) -> None:
         """Print a text representation of the maze."""

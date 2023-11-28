@@ -8,6 +8,12 @@ from mazy.models.maze import MazeState
 from mazy.viewers.graphical_viewer import MazeGraphicalProcessor, MazeGraphicalViewer
 
 
+def test_graphical_viewer_default_values() -> None:
+    """Ensure default values are consistent."""
+    viewer = MazeGraphicalViewer(BinaryTreeBuilder(rows=2, cols=2))
+    assert viewer.name == "graphical"
+
+
 @patch("mazy.viewers.graphical_viewer.MazeGraphicalRenderer")
 def test_graphical_viewer_calls_graphical_renderer(
     renderer_mock: Mock,

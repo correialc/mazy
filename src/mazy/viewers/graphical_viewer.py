@@ -37,6 +37,7 @@ class MazeGraphicalViewer(MazeViewer):
     def __init__(self, maze_builder: MazeBuilder, animated: bool = False) -> None:
         self.maze_builder = maze_builder
         self.animated = animated
+        self.name = "graphical"
 
     def show_maze(self) -> None:
         """Render and show the graphical representation of the maze."""

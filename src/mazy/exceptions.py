@@ -11,3 +11,11 @@ class DuplicatedNeighbor(Exception):
 
 class MissingLink(Exception):
     """Raised when trying to unlink a cell and the link doesn't exist."""
+
+
+class InvalidBuilder(Exception):
+    """Invalid builder name provided."""
+
+
+class InvalidViewer(Exception):
+    """Invalid viewer name provided."""

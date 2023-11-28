@@ -5,6 +5,7 @@ import pytest
 from _pytest.capture import CaptureFixture
 from faker import Faker
 
+from mazy.exceptions import InvalidBuilder, InvalidViewer
 from mazy.maze_maker import (
     DEFAULT_MAZE_BUILDER,
     DEFAULT_MAZE_VIEWER,
@@ -84,6 +85,28 @@ def test_maze_maker_validate_invalid_args(
     )
 
 
+def test_maze_maker_raise_when_invalid_builder(
+    faker: Faker,
+) -> None:
+    """Should raise an error when the builder is not valid."""
+    invalid_builder_name = faker.pystr()
+    args_namespace = validate_args(["-b", invalid_builder_name])
+    with pytest.raises(
+        InvalidBuilder, match=f"Invalid builder: {invalid_builder_name}"
+    ):
+        make_maze(args_namespace)
+
+
+def test_maze_maker_raise_when_invalid_viewer(
+    faker: Faker,
+) -> None:
+    """Should raise an error when the viewer is not valid."""
+    invalid_viewer_name = faker.pystr()
+    args_namespace = validate_args(["-v", invalid_viewer_name])
+    with pytest.raises(InvalidViewer, match=f"Invalid viewer: {invalid_viewer_name}"):
+        make_maze(args_namespace)
+
+
 @patch("mazy.maze_maker.MazeGraphicalViewer")
 def test_maze_maker_make_maze_ascii_viewer(
     maze_graphical_viewer_mock: Mock,
@@ -111,6 +134,7 @@ def test_maze_maker_make_maze_graphical_viewer(
     capsys: CaptureFixture[str],
 ) -> None:
     """Should validate args, make the maze and show in graphical mode."""
+    setattr(maze_graphical_viewer_mock, "identifier", "graphical")
     args_namespace = validate_args(["-r", "5", "-c", "8", "-v", "graphical"])
     make_maze(args_namespace)
     captured = capsys.readouterr()

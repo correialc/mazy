@@ -8,6 +8,12 @@ ROW_SIZE = 2
 COL_SIZE = 5
 
 
+def test_graphical_viewer_default_values() -> None:
+    """Ensure default values are consistent."""
+    viewer = MazeTextViewer(BinaryTreeBuilder(rows=2, cols=2))
+    assert viewer.name == "text"
+
+
 @pytest.mark.parametrize(("rows", "cols"), [(2, 2), (2, 3), (3, 2)])
 def test_ascii_viewer_maze_to_maze(
     rows: int,
