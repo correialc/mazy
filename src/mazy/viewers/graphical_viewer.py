@@ -67,7 +67,7 @@ class MazeGraphicalProcessor:
     @property
     def delta_y(self) -> int:
         """Transform origin y-axis from lower-corner to upper-corner."""
-        return self.rows * CELL_SIZE + EXTERNAL_SIZE - 1
+        return self.rows * CELL_SIZE + EXTERNAL_SIZE
 
     def calculate_cell_points(self, cell: Cell) -> tuple[list[Point], Point]:
         """Calculate primitive coordinates of the maze shapes."""
@@ -165,8 +165,8 @@ class MazeGraphicalRenderer(Window):
                 create_rectangle(
                     center_x=center.x,
                     center_y=center.y,
-                    width=CELL_SIZE // 2,
-                    height=CELL_SIZE // 2,
+                    width=CELL_SIZE,
+                    height=CELL_SIZE,
                     color=UNVISITED_CELL_COLOR,
                 )
             )
