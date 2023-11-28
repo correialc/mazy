@@ -76,7 +76,7 @@ def make_maze(args: Namespace) -> None:
         f"Building a {args.rows}x{args.cols} maze " f"using {args.builder} algorithm..."
     )
 
-    print(f"Maze created.")
+    print("Maze created.")
     viewer.show_maze()
 
 
