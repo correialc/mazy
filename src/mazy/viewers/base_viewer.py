@@ -9,6 +9,7 @@ class MazeViewer(Protocol):
     """Contract for maze viewers."""
 
     maze_builder: MazeBuilder
+    name: str
 
     @abstractmethod
     def show_maze(self) -> None:

@@ -4,6 +4,13 @@ from mazy.models.maze import MazeState
 from mazy.utils import consume_generator
 
 
+def test_binary_tree_builder_default_values() -> None:
+    """Ensure default values are consistent."""
+    builder = BinaryTreeBuilder(rows=3, cols=5)
+
+    assert builder.name == "binary-tree"
+
+
 def test_binary_tree_builder_build_maze() -> None:
     """Ensure each cell has at least 1 and no more than 3 passages."""
     builder = BinaryTreeBuilder(rows=3, cols=5)

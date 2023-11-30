@@ -5,7 +5,18 @@ import pytest
 
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
 from mazy.models.maze import MazeState
-from mazy.viewers.graphical_viewer import MazeGraphicalProcessor, MazeGraphicalViewer
+from mazy.viewers.graphical_viewer import (
+    MazeGraphicalProcessor,
+    MazeGraphicalViewer,
+    CELL_SIZE,
+    EXTERNAL_SIZE,
+)
+
+
+def test_graphical_viewer_default_values() -> None:
+    """Ensure default values are consistent."""
+    viewer = MazeGraphicalViewer(BinaryTreeBuilder(rows=2, cols=2))
+    assert viewer.name == "graphical"
 
 
 @patch("mazy.viewers.graphical_viewer.MazeGraphicalRenderer")
@@ -58,3 +69,22 @@ def test_graphical_processor_process_maze(
         border_points, center_points = processor.process_maze()
 
     assert len(center_points) == 0  # All cell visited
+
+
+@pytest.mark.parametrize(
+    ("rows", "cols", "expected_delta"),
+    [
+        (2, 2, 96),
+        (2, 3, 96),  # Number of columns is irrelevant
+        (3, 3, 128),  # Number of rows is relevant
+    ],
+)
+def test_graphical_processor_delta_y(
+    rows: int,
+    cols: int,
+    expected_delta: int,
+) -> None:
+    """Should transport origin y-axis to upper-corner."""
+    builder = BinaryTreeBuilder(rows, cols)
+    processor = MazeGraphicalProcessor(builder, animated=False)
+    assert processor.delta_y == rows * CELL_SIZE + EXTERNAL_SIZE

@@ -37,6 +37,7 @@ class MazeGraphicalViewer(MazeViewer):
     def __init__(self, maze_builder: MazeBuilder, animated: bool = False) -> None:
         self.maze_builder = maze_builder
         self.animated = animated
+        self.name = "graphical"
 
     def show_maze(self) -> None:
         """Render and show the graphical representation of the maze."""
@@ -65,8 +66,8 @@ class MazeGraphicalProcessor:
 
     @property
     def delta_y(self) -> int:
-        """Transform origin y-axis from lower-corner to upper-corner."""
-        return self.rows * CELL_SIZE + EXTERNAL_SIZE - 1
+        """Transport origin y-axis from lower-corner to upper-corner."""
+        return self.rows * CELL_SIZE + EXTERNAL_SIZE
 
     def calculate_cell_points(self, cell: Cell) -> tuple[list[Point], Point]:
         """Calculate primitive coordinates of the maze shapes."""
@@ -164,8 +165,8 @@ class MazeGraphicalRenderer(Window):
                 create_rectangle(
                     center_x=center.x,
                     center_y=center.y,
-                    width=CELL_SIZE // 2,
-                    height=CELL_SIZE // 2,
+                    width=CELL_SIZE,
+                    height=CELL_SIZE,
                     color=UNVISITED_CELL_COLOR,
                 )
             )

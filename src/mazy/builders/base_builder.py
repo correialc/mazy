@@ -11,6 +11,12 @@ class MazeBuilder(ABC):
     def __init__(self, rows: int, cols: int):
         self.maze = Maze(rows, cols)
 
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        """Builder name."""
+        ...
+
     @abstractmethod
     def build_maze(self) -> Generator[Maze, None, Maze]:
         """Build a maze.
