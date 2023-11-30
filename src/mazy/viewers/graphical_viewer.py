@@ -66,7 +66,7 @@ class MazeGraphicalProcessor:
 
     @property
     def delta_y(self) -> int:
-        """Transform origin y-axis from lower-corner to upper-corner."""
+        """Transport origin y-axis from lower-corner to upper-corner."""
         return self.rows * CELL_SIZE + EXTERNAL_SIZE
 
     def calculate_cell_points(self, cell: Cell) -> tuple[list[Point], Point]:
