@@ -1,5 +1,6 @@
 """Dummy builder."""
 from mazy.builders.dummy_builder import DummyBuilder
+from mazy.models.builder import BuilderAlgorithm
 from mazy.models.maze import MazeState
 from mazy.utils import consume_generator
 
@@ -8,7 +9,7 @@ def test_dummy_builder_default_values() -> None:
     """Ensure default values are consistent."""
     builder = DummyBuilder(rows=2, cols=2)
 
-    assert builder.name == "dummy"
+    assert builder.name == BuilderAlgorithm.DUMMY.value
 
 
 def test_dummy_builder_build_maze() -> None:

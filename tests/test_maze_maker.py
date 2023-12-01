@@ -14,6 +14,7 @@ from mazy.maze_maker import (
     make_maze,
     validate_args,
 )
+from mazy.models.builder import BuilderAlgorithm
 
 
 @pytest.mark.parametrize(
@@ -105,6 +106,27 @@ def test_maze_maker_raise_when_invalid_viewer(
     args_namespace = validate_args(["-v", invalid_viewer_name])
     with pytest.raises(InvalidViewer, match=f"Invalid viewer: {invalid_viewer_name}"):
         make_maze(args_namespace)
+
+
+@pytest.mark.parametrize("builder_algorithm", [algo for algo in BuilderAlgorithm])
+def test_maze_maker_build_maze(
+    builder_algorithm: BuilderAlgorithm,
+    capsys: CaptureFixture[str],
+) -> None:
+    """Should create a valid maze for every builder algorithm."""
+    args_namespace = validate_args(["-b", builder_algorithm.value, "-v", "text"])
+    make_maze(args_namespace)
+    captured = capsys.readouterr()
+
+    assert "Loading text viewer..."
+    assert (
+        f"Building a 3x4 maze using {builder_algorithm.value} algorithm..."
+        in captured.out
+    )
+    assert "+    +----+" in captured.out
+    assert "+----+    +" in captured.out
+    assert "Text viewer loaded." in captured.out
+    assert "Maze created." in captured.out
 
 
 @patch("mazy.maze_maker.MazeGraphicalViewer")
