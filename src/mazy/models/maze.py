@@ -1,4 +1,4 @@
-"""Definitions related to a maze."""
+"""Models related to a maze."""
 from enum import Enum
 from typing import Generator, Sequence
 

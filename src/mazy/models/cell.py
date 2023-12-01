@@ -1,4 +1,4 @@
-"""Definitions related to a cell."""
+"""Models related to a cell."""
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum, auto
 
@@ -11,8 +11,6 @@ class Role(IntEnum):
     NONE = 0
     ENTRANCE = auto()
     EXIT = auto()
-    EXTERIOR = auto()
-    WALL = auto()
 
 
 class Direction(Enum):

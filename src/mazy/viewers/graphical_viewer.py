@@ -21,11 +21,11 @@ from mazy.viewers.base_viewer import MazeViewer
 SCREEN_TITLE = "Mazy"
 BACKGROUND_COLOR = color.BLACK
 BORDER_COLOR = color.GRAY
-UNVISITED_CELL_COLOR = color.BEIGE
+UNVISITED_CELL_COLOR = color.GRAY
 
 CELL_SIZE = 32
+CELL_FILL_SIZE = 24
 EXTERNAL_SIZE = 32
-ANIMATION_DELAY_SEC = 1
 
 Point = namedtuple("Point", ["x", "y"])
 Center = namedtuple("Center", ["center_x", "center_y"])
@@ -165,8 +165,8 @@ class MazeGraphicalRenderer(Window):
                 create_rectangle(
                     center_x=center.x,
                     center_y=center.y,
-                    width=CELL_SIZE,
-                    height=CELL_SIZE,
+                    width=CELL_FILL_SIZE,
+                    height=CELL_FILL_SIZE,
                     color=UNVISITED_CELL_COLOR,
                 )
             )

@@ -6,7 +6,9 @@ from typing import Optional, Sequence
 from mazy.builders.base_builder import MazeBuilder
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
 from mazy.builders.dummy_builder import DummyBuilder
+from mazy.builders.sidewinder import SidewinderBuilder
 from mazy.exceptions import InvalidBuilder, InvalidViewer
+from mazy.models.builder import BuilderAlgorithm
 from mazy.viewers.ascii_viewer import MazeTextViewer
 from mazy.viewers.base_viewer import MazeViewer
 from mazy.viewers.graphical_viewer import MazeGraphicalViewer
@@ -61,9 +63,11 @@ def make_maze(args: Namespace) -> None:
     builder: MazeBuilder
     print(f"Loading {args.builder} builder...")
     match args.builder:
-        case "binary-tree":
+        case BuilderAlgorithm.BINARY_TREE.value:
             builder = BinaryTreeBuilder(args.rows, args.cols)
-        case "dummy":
+        case BuilderAlgorithm.SIDEWINDER.value:
+            builder = SidewinderBuilder(args.rows, args.cols)
+        case BuilderAlgorithm.DUMMY.value:
             builder = DummyBuilder(args.rows, args.cols)
         case _:
             raise InvalidBuilder(f"Invalid builder: {args.builder}")
