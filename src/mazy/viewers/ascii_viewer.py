@@ -35,10 +35,11 @@ class MazeTextViewer(MazeViewer):
 
             for col in range(maze.cols):
                 cell = maze[row, col]
+                content = cell.content.center(4) if cell.content else "    "
                 maze_str += (
-                    "     "
+                    f" {content}"
                     if cell.has_passage_to_direction(Direction.WEST)
-                    else "|    "
+                    else f"|{content}"
                 )
                 if col == maze.cols - 1:
                     maze_str += "|"
