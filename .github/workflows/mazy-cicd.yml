@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "release/*" ]
 
 permissions:
   contents: read
@@ -14,24 +14,33 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12]
+
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.11
+
+    - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: "3.11"
+        python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
+
     - name: Typing check with mypy
       run: |
         poetry run mypy --strict .
+
     - name: Lint and format checks with ruff
       run: |
         poetry run ruff check .
         poetry run ruff format . --check
+
     - name: Test with pytest
       run: |
         poetry run pytest
