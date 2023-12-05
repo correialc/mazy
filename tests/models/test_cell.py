@@ -12,6 +12,8 @@ def test_cell_default_values() -> None:
     cell = Cell(row=0, col=1)
     assert cell.role == Role.NONE
     assert cell.visited is False
+    assert cell.solution is False
+    assert cell.content is None
 
 
 @pytest.mark.parametrize(

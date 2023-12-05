@@ -41,3 +41,13 @@ def test_sidewinder_builder_build_maze_manages_maze_states() -> None:
 
     assert next(maze_generator).state == MazeState.BUILDING
     assert consume_generator(maze_generator).state == MazeState.READY
+
+
+def test_sidewinder_builder_build_maze_does_not_change_cell_solution_fields() -> None:
+    """Should not change cell fields related to the maze solution path."""
+    builder = SidewinderBuilder(rows=3, cols=5)
+    maze = consume_generator(builder.build_maze())
+
+    for cell in maze.traverse_by_cell():
+        assert cell.solution is False
+        assert cell.content is None

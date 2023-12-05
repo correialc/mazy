@@ -1,6 +1,7 @@
 """Models related to a cell."""
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum, auto
+from typing import Optional
 
 from mazy.exceptions import DuplicatedNeighbor, MissingLink, NeighborhoodError
 
@@ -58,6 +59,9 @@ class Cell:
 
     role: Role = Role.NONE
     visited: bool = False
+    solution: bool = False
+    content: Optional[str] = None
+
     neighbors: dict[Direction, Neighbor] = field(default_factory=dict)
 
     def __repr__(self) -> str:
