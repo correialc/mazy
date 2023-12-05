@@ -1,6 +1,8 @@
 ## Mazy
 
 ![CICD](https://github.com/correialc/mazy/actions/workflows/mazy-cicd.yml/badge.svg)
+![python-versions](https://img.shields.io/badge/python-3.11+-blue.svg)
+![GitHub License](https://img.shields.io/github/license/correialc/mazy)
 
 This is an exploratory project to create maze builders and solvers in Python. 
 
@@ -11,7 +13,6 @@ The project is aimed at students and enthusiasts of maze algorithms. It's also a
 
 ### Getting Started
 
-It's recommended to use Python 3.11 or above:
 - Clone the project repository from Github
 - From the project's root folder, run `pip install mazy`
 - Run `python maze_maker.py`
