@@ -16,6 +16,24 @@ def test_cell_default_values() -> None:
     assert cell.content is None
 
 
+def test_cell_is_hashable() -> None:
+    """Ensure that objects of the Cell class are hashable."""
+    cell = Cell(0, 0)
+    assert hash(cell) == hash(cell.id)
+
+
+def test_cell_identity_and_equality() -> None:
+    """Should properly compare two instances of the Cell class."""
+    cell = Cell(0, 0)
+    same_cell = cell
+    other_cell = Cell(0, 0)
+
+    assert cell is same_cell
+    assert cell == same_cell
+    assert cell is not other_cell
+    assert cell != other_cell
+
+
 @pytest.mark.parametrize(
     ("direction", "expected_opposite"),
     [
