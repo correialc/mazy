@@ -186,6 +186,12 @@ class Cell:
             ]
         )
 
+    def passages(self) -> list["Cell"]:
+        """Return the list of neighbor cells with a carved passage."""
+        return [
+            neighbor.cell for neighbor in self.neighbors.values() if neighbor.passage
+        ]
+
 
 def is_neighborhood_valid(cell: Cell, neighbor: Cell, direction: Direction) -> bool:
     """Validate the neighborhood between 2 cells in a given direction.

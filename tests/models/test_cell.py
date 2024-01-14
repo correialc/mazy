@@ -300,3 +300,20 @@ def test_cell_passage_count() -> None:
     cell.link_to(cell_on_south, passage=True, direction=Direction.SOUTH)
 
     assert cell.passage_count() == 2
+
+
+def test_cell_neighbors_with_carved_passage() -> None:
+    """Should return the collection of neighbors cells with a carved passage."""
+    cell = Cell(row=1, col=1)
+
+    cell_on_east = Cell(row=1, col=2)
+    cell.link_to(cell_on_east, passage=True, direction=Direction.EAST)
+    cell_on_south = Cell(row=2, col=1)
+    cell.link_to(cell_on_south, passage=True, direction=Direction.SOUTH)
+
+    cell_on_west = Cell(row=1, col=0)  # Has no passage
+    cell.link_to(cell_on_west, passage=False, direction=Direction.WEST)
+
+    expected_cells = [cell_on_east, cell_on_south]
+
+    assert cell.passages() == expected_cells
