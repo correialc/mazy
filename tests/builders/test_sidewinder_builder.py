@@ -1,6 +1,6 @@
 """Tests for the binary tree builder."""
 
-from mazy.builders.sidewinder import SidewinderBuilder
+from mazy.builders.sidewinder_builder import SidewinderBuilder
 from mazy.models.builder import BuilderAlgorithm
 from mazy.models.maze import MazeState
 from mazy.utils import consume_generator
@@ -51,3 +51,18 @@ def test_sidewinder_builder_build_maze_does_not_change_cell_solution_fields() ->
     for cell in maze.traverse_by_cell():
         assert cell.solution is False
         assert cell.content is None
+
+
+def test_binary_tree_builder_build_maze_update_current_cell() -> None:
+    """Ensure the builder updates the current cell while building the maze."""
+    builder = SidewinderBuilder(rows=3, cols=5)
+    maze_generator = builder.build_maze()
+
+    maze = next(maze_generator)
+    assert maze[0, 0].current is True
+    assert maze.current_cell == maze[0, 0]
+
+    maze = next(maze_generator)
+    assert maze[0, 0].current is False
+    assert maze.current_cell != maze[0, 0]
+    assert maze.current_cell.current is True

@@ -20,6 +20,7 @@ class SidewinderBuilder(MazeBuilder):
     def build_maze(self) -> Generator[Maze, None, Maze]:
         """Build a maze using Sidewinder algorithm."""
         run = []
+        previous_cell = self.maze.current_cell
         for cell in self.maze.traverse_by_cell():
             choices = [
                 direction
@@ -38,7 +39,8 @@ class SidewinderBuilder(MazeBuilder):
                     cell_from_run.carve_passage_to_direction(target_direction)
                     run = []
 
-            cell.visited = True
+            self.update_cell_state(current_cell=cell, previous_cell=previous_cell)
+            previous_cell = cell
             yield self.maze
 
         self.maze.state = MazeState.READY

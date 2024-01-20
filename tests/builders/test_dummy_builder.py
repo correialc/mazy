@@ -50,3 +50,18 @@ def test_dummy_builder_build_maze_does_not_change_cell_solution_fields() -> None
     for cell in maze.traverse_by_cell():
         assert cell.solution is False
         assert cell.content is None
+
+
+def test_binary_tree_builder_build_maze_update_current_cell() -> None:
+    """Ensure the builder updates the current cell while building the maze."""
+    builder = DummyBuilder(rows=3, cols=5)
+    maze_generator = builder.build_maze()
+
+    maze = next(maze_generator)
+    assert maze[0, 0].current is True
+    assert maze.current_cell == maze[0, 0]
+
+    maze = next(maze_generator)
+    assert maze[0, 0].current is False
+    assert maze.current_cell != maze[0, 0]
+    assert maze.current_cell.current is True

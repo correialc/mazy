@@ -60,15 +60,26 @@ def test_graphical_processor_process_maze(
     """Should return a list of cell coordinate points."""
     builder = BinaryTreeBuilder(rows=rows, cols=cols)
     processor = MazeGraphicalProcessor(builder, animated=True)
-    border_points, center_points = processor.process_maze()
+    (
+        border_points,
+        unvisited_center_points,
+        current_center_points,
+    ) = processor.process_maze()
 
     assert len(border_points) > 0
-    assert len(center_points) == expected_centers  # Only the the first cell visited
+    assert (
+        len(unvisited_center_points) == expected_centers
+    )  # Only the first cell visited
 
     for _ in range(rows * cols):
-        border_points, center_points = processor.process_maze()
+        (
+            border_points,
+            unvisited_center_points,
+            current_center_points,
+        ) = processor.process_maze()
+        assert len(current_center_points) == 1
 
-    assert len(center_points) == 0  # All cell visited
+    assert len(unvisited_center_points) == 0  # All cell visited
 
 
 @pytest.mark.parametrize(
