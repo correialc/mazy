@@ -1,6 +1,8 @@
 """Models related to a cell."""
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum, auto
+from typing import Optional
+from uuid import UUID, uuid4
 
 from mazy.exceptions import DuplicatedNeighbor, MissingLink, NeighborhoodError
 
@@ -58,7 +60,25 @@ class Cell:
 
     role: Role = Role.NONE
     visited: bool = False
+    solution: bool = False
+    content: Optional[str] = None
     neighbors: dict[Direction, Neighbor] = field(default_factory=dict)
+
+    _id: UUID = field(init=False, default_factory=uuid4)
+
+    @property
+    def id(self) -> UUID:
+        """Immutable-like identification for a cell."""
+        return self._id
+
+    def __hash__(self) -> int:
+        """Make the cell object hashable.
+
+        Cells are mutable objects, but they need an immutable independent field
+        to make possible to use cells in hashmaps even if the values of the cell
+        attributes change along the time.
+        """
+        return hash(self._id)
 
     def __repr__(self) -> str:
         """Text representation of a Cell object."""
@@ -165,6 +185,12 @@ class Cell:
                 if neighbor.passage
             ]
         )
+
+    def passages(self) -> list["Cell"]:
+        """Return the list of neighbor cells with a carved passage."""
+        return [
+            neighbor.cell for neighbor in self.neighbors.values() if neighbor.passage
+        ]
 
 
 def is_neighborhood_valid(cell: Cell, neighbor: Cell, direction: Direction) -> bool:

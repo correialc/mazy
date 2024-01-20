@@ -14,7 +14,7 @@ from arcade import (
 
 from mazy.builders.base_builder import MazeBuilder
 from mazy.models.cell import Cell, Direction, Role
-from mazy.models.maze import Maze
+from mazy.models.maze import Maze, MazeState
 from mazy.utils import consume_generator
 from mazy.viewers.base_viewer import MazeViewer
 
@@ -63,6 +63,7 @@ class MazeGraphicalProcessor:
             maze_builder.maze if animated else consume_generator(self.maze_generator)
         )
         self.animated = animated
+        self.processing = True
 
     @property
     def delta_y(self) -> int:
@@ -120,20 +121,24 @@ class MazeGraphicalProcessor:
 
     def process_maze(self) -> tuple[list[Point], list[Point]]:
         """Traverse the latest maze version processing graphical info."""
-        if self.animated:
-            next(self.maze_generator, None)
+        if self.processing:
+            if self.animated:
+                next(self.maze_generator, None)
 
-        cell_border_points = []
-        cell_center_points = []
+            self.cell_border_points = []
+            self.cell_center_points = []
 
-        for cell in self.maze.traverse_by_cell():
-            border_points, center_point = self.calculate_cell_points(cell)
-            cell_border_points.extend(border_points)
+            for cell in self.maze.traverse_by_cell():
+                border_points, center_point = self.calculate_cell_points(cell)
+                self.cell_border_points.extend(border_points)
 
-            if not cell.visited:
-                cell_center_points.append(center_point)
+                if not cell.visited:
+                    self.cell_center_points.append(center_point)
 
-        return cell_border_points, cell_center_points
+        if self.maze.state == MazeState.READY:
+            self.processing = False
+
+        return self.cell_border_points, self.cell_center_points
 
 
 class MazeGraphicalRenderer(Window):

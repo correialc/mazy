@@ -12,6 +12,26 @@ def test_cell_default_values() -> None:
     cell = Cell(row=0, col=1)
     assert cell.role == Role.NONE
     assert cell.visited is False
+    assert cell.solution is False
+    assert cell.content is None
+
+
+def test_cell_is_hashable() -> None:
+    """Ensure that objects of the Cell class are hashable."""
+    cell = Cell(0, 0)
+    assert hash(cell) == hash(cell.id)
+
+
+def test_cell_identity_and_equality() -> None:
+    """Should properly compare two instances of the Cell class."""
+    cell = Cell(0, 0)
+    same_cell = cell
+    other_cell = Cell(0, 0)
+
+    assert cell is same_cell
+    assert cell == same_cell
+    assert cell is not other_cell
+    assert cell != other_cell
 
 
 @pytest.mark.parametrize(
@@ -280,3 +300,20 @@ def test_cell_passage_count() -> None:
     cell.link_to(cell_on_south, passage=True, direction=Direction.SOUTH)
 
     assert cell.passage_count() == 2
+
+
+def test_cell_neighbors_with_carved_passage() -> None:
+    """Should return the collection of neighbors cells with a carved passage."""
+    cell = Cell(row=1, col=1)
+
+    cell_on_east = Cell(row=1, col=2)
+    cell.link_to(cell_on_east, passage=True, direction=Direction.EAST)
+    cell_on_south = Cell(row=2, col=1)
+    cell.link_to(cell_on_south, passage=True, direction=Direction.SOUTH)
+
+    cell_on_west = Cell(row=1, col=0)  # Has no passage
+    cell.link_to(cell_on_west, passage=False, direction=Direction.WEST)
+
+    expected_cells = [cell_on_east, cell_on_south]
+
+    assert cell.passages() == expected_cells
