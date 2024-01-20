@@ -6,7 +6,7 @@ from typing import Optional, Sequence
 from mazy.builders.base_builder import MazeBuilder
 from mazy.builders.binary_tree_builder import BinaryTreeBuilder
 from mazy.builders.dummy_builder import DummyBuilder
-from mazy.builders.sidewinder import SidewinderBuilder
+from mazy.builders.sidewinder_builder import SidewinderBuilder
 from mazy.exceptions import InvalidBuilder, InvalidViewer
 from mazy.models.builder import BuilderAlgorithm
 from mazy.viewers.ascii_viewer import MazeTextViewer

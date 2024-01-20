@@ -13,6 +13,7 @@ def test_cell_default_values() -> None:
     assert cell.role == Role.NONE
     assert cell.visited is False
     assert cell.solution is False
+    assert cell.current is False
     assert cell.content is None
 
 

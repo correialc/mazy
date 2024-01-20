@@ -11,6 +11,48 @@ def test_maze_init() -> None:
     assert maze.cols == 3
 
 
+def test_maze_init_set_entrance_and_exit() -> None:
+    """Must set exactly one entrance and one exit cells.
+
+    For now, the origin will be at the maze origin (0,0)
+    and the exit at the opposite corner.
+    """
+    maze = Maze(rows=3, cols=3)
+
+    origin_cell = maze[0, 0]
+    exit_cell = maze[2, 2]
+
+    assert origin_cell.role == Role.ENTRANCE
+    assert exit_cell.role == Role.EXIT
+
+    special_cells = [
+        cell.role
+        for cell in maze.traverse_by_cell()
+        if cell.role in [Role.ENTRANCE, Role.EXIT]
+    ]
+
+    assert Role.ENTRANCE in special_cells
+    assert Role.EXIT in special_cells
+    assert len(special_cells) == 2
+
+
+def test_maze_init_set_entrance_as_current() -> None:
+    """Should set the entrance as the unique current cell."""
+    maze = Maze(rows=3, cols=3)
+
+    origin_cell = maze[0, 0]
+
+    assert origin_cell.role == Role.ENTRANCE
+    assert origin_cell.current is True
+
+    current_cells = [cell for cell in maze.traverse_by_cell() if cell.current]
+
+    assert len(current_cells) == 1
+    assert current_cells.pop() == origin_cell
+
+    assert maze.current_cell == origin_cell
+
+
 def test_maze_cell_get_accessor() -> None:
     """Ensure individual cells of the maze can be accessed by row and col."""
     maze = Maze(rows=2, cols=3)
@@ -46,31 +88,6 @@ def test_maze_registry_neighbors() -> None:
     assert Direction.WEST in corner_cell.neighbors
     assert Direction.SOUTH not in corner_cell.neighbors
     assert Direction.EAST not in corner_cell.neighbors
-
-
-def test_maze_registry_neighbors_creates_entrance_and_exit() -> None:
-    """Must create exactly one entrance and one exit.
-
-    For now, the origin will be at the origin and the exit at the
-    opposite corner.
-    """
-    maze = Maze(rows=3, cols=3)
-
-    origin_cell = maze[0, 0]
-    exit_cell = maze[2, 2]
-
-    assert origin_cell.role == Role.ENTRANCE
-    assert exit_cell.role == Role.EXIT
-
-    special_cells = [
-        cell.role
-        for cell in maze.traverse_by_cell()
-        if cell.role in [Role.ENTRANCE, Role.EXIT]
-    ]
-
-    assert Role.ENTRANCE in special_cells
-    assert Role.EXIT in special_cells
-    assert len(special_cells) == 2
 
 
 def test_maze_traverse_maze_by_cell() -> None:

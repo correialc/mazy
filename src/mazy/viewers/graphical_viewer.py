@@ -22,6 +22,8 @@ SCREEN_TITLE = "Mazy"
 BACKGROUND_COLOR = color.BLACK
 BORDER_COLOR = color.GRAY
 UNVISITED_CELL_COLOR = color.GRAY
+CURRENT_CELL_COLOR = color.YELLOW
+
 
 CELL_SIZE = 32
 CELL_FILL_SIZE = 24
@@ -119,26 +121,33 @@ class MazeGraphicalProcessor:
 
         return border_points, center_point
 
-    def process_maze(self) -> tuple[list[Point], list[Point]]:
+    def process_maze(self) -> tuple[list[Point], list[Point], list[Point]]:
         """Traverse the latest maze version processing graphical info."""
-        if self.processing:
-            if self.animated:
-                next(self.maze_generator, None)
+        cell_border_points = []
+        unvisited_cell_center_points = []
+        current_cell_center_points = []
 
-            self.cell_border_points = []
-            self.cell_center_points = []
+        if self.animated:
+            next(self.maze_generator, None)
 
-            for cell in self.maze.traverse_by_cell():
-                border_points, center_point = self.calculate_cell_points(cell)
-                self.cell_border_points.extend(border_points)
+        for cell in self.maze.traverse_by_cell():
+            border_points, center_point = self.calculate_cell_points(cell)
+            cell_border_points.extend(border_points)
 
-                if not cell.visited:
-                    self.cell_center_points.append(center_point)
+            if not cell.visited:
+                unvisited_cell_center_points.append(center_point)
+
+            if cell.current:
+                current_cell_center_points.append(center_point)
 
         if self.maze.state == MazeState.READY:
             self.processing = False
 
-        return self.cell_border_points, self.cell_center_points
+        return (
+            cell_border_points,
+            unvisited_cell_center_points,
+            current_cell_center_points,
+        )
 
 
 class MazeGraphicalRenderer(Window):
@@ -162,23 +171,39 @@ class MazeGraphicalRenderer(Window):
 
     def on_update(self, delta_time: float) -> None:
         """Update objects before rendering."""
-        border_points, center_points = self.processor.process_maze()
-        self.maze_shapes = ShapeElementList()  # type: ignore[no-untyped-call]
+        if self.processor.processing:
+            (
+                border_points,
+                unvisited_center_points,
+                current_center_points,
+            ) = self.processor.process_maze()
+            self.maze_shapes = ShapeElementList()  # type: ignore[no-untyped-call]
 
-        for center in center_points:
-            self.maze_shapes.append(
-                create_rectangle(
-                    center_x=center.x,
-                    center_y=center.y,
-                    width=CELL_FILL_SIZE,
-                    height=CELL_FILL_SIZE,
-                    color=UNVISITED_CELL_COLOR,
+            for center in unvisited_center_points:
+                self.maze_shapes.append(
+                    create_rectangle(
+                        center_x=center.x,
+                        center_y=center.y,
+                        width=CELL_FILL_SIZE,
+                        height=CELL_FILL_SIZE,
+                        color=UNVISITED_CELL_COLOR,
+                    )
                 )
-            )
 
-        self.maze_shapes.append(
-            create_lines(point_list=border_points, color=BORDER_COLOR)
-        )
+            for center in current_center_points:
+                self.maze_shapes.append(
+                    create_rectangle(
+                        center_x=center.x,
+                        center_y=center.y,
+                        width=CELL_FILL_SIZE,
+                        height=CELL_FILL_SIZE,
+                        color=CURRENT_CELL_COLOR,
+                    )
+                )
+
+            self.maze_shapes.append(
+                create_lines(point_list=border_points, color=BORDER_COLOR)
+            )
 
     def on_draw(self) -> None:
         """Render all objects for the active window."""

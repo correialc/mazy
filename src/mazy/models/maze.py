@@ -22,21 +22,27 @@ class Maze:
         self.cells: Sequence[Sequence[Cell]] = [
             [Cell(row, col) for col in range(cols)] for row in range(rows)
         ]
-        self.registry_neighbors()
+
+        self._set_entrance_and_exit()
+        self._registry_neighbors()
 
     def __getitem__(self, index: tuple[int, int]) -> Cell:
         i, j = index
         return self.cells[i][j]
 
-    def registry_neighbors(self) -> None:
+    def _set_entrance_and_exit(self) -> None:
+        """Set entrance and exit cells."""
+        self[0, 0].role = Role.ENTRANCE
+        self[0, 0].current = True
+        self.current_cell = self[0, 0]
+        self[self.rows - 1, self.cols - 1].role = Role.EXIT
+
+    def _registry_neighbors(self) -> None:
         """Registry all neighbors.
 
         The external cell have no neighbors at the maze frontiers.
         The maze have no passages at this moment.
         """
-        self[0, 0].role = Role.ENTRANCE
-        self[self.rows - 1, self.cols - 1].role = Role.EXIT
-
         for row in range(self.rows):
             for col in range(self.cols):
                 cell = self[row, col]
