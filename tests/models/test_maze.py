@@ -37,20 +37,21 @@ def test_maze_init_set_entrance_and_exit() -> None:
 
 
 def test_maze_init_set_entrance_as_current() -> None:
-    """Should set the entrance as the unique current cell."""
+    """Should set the entrance as the unique active cell."""
     maze = Maze(rows=3, cols=3)
 
     origin_cell = maze[0, 0]
 
     assert origin_cell.role == Role.ENTRANCE
-    assert origin_cell.current is True
+    assert origin_cell.active is True
 
-    current_cells = [cell for cell in maze.traverse_by_cell() if cell.current]
+    active_cells = [cell for cell in maze.traverse_by_cell() if cell.active]
 
-    assert len(current_cells) == 1
-    assert current_cells.pop() == origin_cell
+    assert len(active_cells) == 1
+    assert active_cells.pop() == origin_cell
 
-    assert maze.current_cell == origin_cell
+    assert len(maze.active_cells) == 1
+    assert maze.active_cells.pop() == origin_cell
 
 
 def test_maze_cell_get_accessor() -> None:

@@ -27,11 +27,13 @@ class MazeBuilder(ABC):
         """
         ...
 
-    def update_cell_state(self, current_cell: Cell, previous_cell: Cell) -> None:
+    def update_cell_state(self, current_cell: Cell) -> None:
         """Update the state of the cell for the current maze build step."""
-        current_cell.visited = True
+        self.maze.previous_active_cells = set()
+        for cell in self.maze.active_cells:
+            cell.active = False
+            self.maze.previous_active_cells.add(cell)
 
-        if current_cell != previous_cell:
-            previous_cell.current = False
-            current_cell.current = True
-            self.maze.current_cell = current_cell
+        current_cell.visited = True
+        current_cell.active = True
+        self.maze.active_cells = {current_cell}

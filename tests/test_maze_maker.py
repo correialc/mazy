@@ -1,8 +1,10 @@
 """Tests for the command line CLI."""
+import logging
 from unittest.mock import Mock, patch
 
 import pytest
 from _pytest.capture import CaptureFixture
+from _pytest.logging import LogCaptureFixture
 from faker import Faker
 
 from mazy.exceptions import InvalidBuilder, InvalidViewer
@@ -112,59 +114,74 @@ def test_maze_maker_raise_when_invalid_viewer(
 def test_maze_maker_build_maze(
     builder_algorithm: BuilderAlgorithm,
     capsys: CaptureFixture[str],
+    caplog: LogCaptureFixture,
 ) -> None:
     """Should create a valid maze for every builder algorithm."""
-    args_namespace = validate_args(["-b", builder_algorithm.value, "-v", "text"])
-    make_maze(args_namespace)
-    captured = capsys.readouterr()
+    with caplog.at_level(logging.INFO):
+        args_namespace = validate_args(["-b", builder_algorithm.value, "-v", "text"])
+        make_maze(args_namespace)
+        captured = capsys.readouterr()
 
-    assert "Loading text viewer..."
-    assert (
-        f"Building a 3x4 maze using {builder_algorithm.value} algorithm..."
-        in captured.out
-    )
-    assert "+    +----+" in captured.out
-    assert "+----+    +" in captured.out
-    assert "Text viewer loaded." in captured.out
-    assert "Maze created." in captured.out
+        assert f"Loading {builder_algorithm.value} builder..." in caplog.text
+        assert f"{builder_algorithm.value.capitalize()} builder loaded." in caplog.text
+        assert "Loading text viewer..." in caplog.text
+        assert "Text viewer loaded." in caplog.text
+        assert (
+            f"Building a 3x4 maze using {builder_algorithm.value} algorithm..."
+            in caplog.text
+        )
+
+        assert "+    +----+" in captured.out
+        assert "+----+    +" in captured.out
 
 
 @patch("mazy.maze_maker.MazeGraphicalViewer")
 def test_maze_maker_make_maze_ascii_viewer(
     maze_graphical_viewer_mock: Mock,
     capsys: CaptureFixture[str],
+    caplog: LogCaptureFixture,
 ) -> None:
     """Should validate args, make the maze and show in ASCII mode."""
-    args_namespace = validate_args(["-r", "5", "-c", "8", "-v", "text"])
-    make_maze(args_namespace)
-    captured = capsys.readouterr()
+    with caplog.at_level(logging.INFO):
+        args_namespace = validate_args(["-r", "5", "-c", "8", "-v", "text"])
+        make_maze(args_namespace)
+        captured = capsys.readouterr()
 
-    assert "Loading text viewer..."
-    assert (
-        f"Building a 5x8 maze using {DEFAULT_MAZE_BUILDER} algorithm..." in captured.out
-    )
-    assert "+    +----+" in captured.out
-    assert "+----+    +" in captured.out
-    assert "Text viewer loaded." in captured.out
-    assert "Maze created." in captured.out
-    maze_graphical_viewer_mock.assert_not_called()
+        assert f"Loading {DEFAULT_MAZE_BUILDER} builder..." in caplog.text
+        assert f"{DEFAULT_MAZE_BUILDER.capitalize()} builder loaded." in caplog.text
+        assert "Loading text viewer..." in caplog.text
+        assert "Text viewer loaded." in caplog.text
+
+        assert (
+            f"Building a 5x8 maze using {DEFAULT_MAZE_BUILDER} algorithm..."
+            in caplog.text
+        )
+
+        assert "+    +----+" in captured.out
+        assert "+----+    +" in captured.out
+
+        maze_graphical_viewer_mock.assert_not_called()
 
 
 @patch("mazy.maze_maker.MazeGraphicalViewer")
 def test_maze_maker_make_maze_graphical_viewer(
     maze_graphical_viewer_mock: Mock,
-    capsys: CaptureFixture[str],
+    caplog: LogCaptureFixture,
 ) -> None:
     """Should validate args, make the maze and show in graphical mode."""
-    setattr(maze_graphical_viewer_mock, "identifier", "graphical")
-    args_namespace = validate_args(["-r", "5", "-c", "8", "-v", "graphical"])
-    make_maze(args_namespace)
-    captured = capsys.readouterr()
+    with caplog.at_level(logging.INFO):
+        setattr(maze_graphical_viewer_mock, "identifier", "graphical")
+        args_namespace = validate_args(["-r", "5", "-c", "8", "-v", "graphical"])
+        make_maze(args_namespace)
 
-    assert "Loading graphical viewer..."
-    assert (
-        f"Building a 5x8 maze using {DEFAULT_MAZE_BUILDER} algorithm..." in captured.out
-    )
-    assert "Graphical viewer loaded." in captured.out
-    assert "Maze created." in captured.out
-    maze_graphical_viewer_mock.assert_called()
+        assert f"Loading {DEFAULT_MAZE_BUILDER} builder..." in caplog.text
+        assert f"{DEFAULT_MAZE_BUILDER.capitalize()} builder loaded." in caplog.text
+        assert "Loading graphical viewer..." in caplog.text
+        assert "Graphical viewer loaded." in caplog.text
+
+        assert (
+            f"Building a 5x8 maze using {DEFAULT_MAZE_BUILDER} algorithm..."
+            in caplog.text
+        )
+
+        maze_graphical_viewer_mock.assert_called()

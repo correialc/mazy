@@ -51,37 +51,6 @@ def test_graphical_processor_animated() -> None:
     assert processor.maze.state == MazeState.READY  # type: ignore[comparison-overlap]
 
 
-@pytest.mark.parametrize(("rows", "cols", "expected_centers"), [(2, 2, 3), (2, 3, 5)])
-def test_graphical_processor_process_maze(
-    rows: int,
-    cols: int,
-    expected_centers: int,
-) -> None:
-    """Should return a list of cell coordinate points."""
-    builder = BinaryTreeBuilder(rows=rows, cols=cols)
-    processor = MazeGraphicalProcessor(builder, animated=True)
-    (
-        border_points,
-        unvisited_center_points,
-        current_center_points,
-    ) = processor.process_maze()
-
-    assert len(border_points) > 0
-    assert (
-        len(unvisited_center_points) == expected_centers
-    )  # Only the first cell visited
-
-    for _ in range(rows * cols):
-        (
-            border_points,
-            unvisited_center_points,
-            current_center_points,
-        ) = processor.process_maze()
-        assert len(current_center_points) == 1
-
-    assert len(unvisited_center_points) == 0  # All cell visited
-
-
 @pytest.mark.parametrize(
     ("rows", "cols", "expected_delta"),
     [

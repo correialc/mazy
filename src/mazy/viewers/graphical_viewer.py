@@ -1,15 +1,15 @@
 """Graphical viewer."""
+import logging
 from collections import namedtuple
-from typing import Any, Generator
+from typing import Generator, cast, Tuple
 
 from arcade import (
-    Shape,
-    ShapeElementList,
     Window,
     color,
-    create_lines,
-    create_rectangle,
     set_background_color,
+    SpriteList,
+    SpriteSolidColor,
+    Sprite,
 )
 
 from mazy.builders.base_builder import MazeBuilder
@@ -18,12 +18,14 @@ from mazy.models.maze import Maze, MazeState
 from mazy.utils import consume_generator
 from mazy.viewers.base_viewer import MazeViewer
 
+logger = logging.getLogger(__name__)
+
 SCREEN_TITLE = "Mazy"
 BACKGROUND_COLOR = color.BLACK
 BORDER_COLOR = color.GRAY
 UNVISITED_CELL_COLOR = color.GRAY
-CURRENT_CELL_COLOR = color.YELLOW
-
+VISITED_CELL_COLOR = color.BROWN
+ACTIVE_CELL_COLOR = color.YELLOW
 
 CELL_SIZE = 32
 CELL_FILL_SIZE = 24
@@ -43,14 +45,17 @@ class MazeGraphicalViewer(MazeViewer):
 
     def show_maze(self) -> None:
         """Render and show the graphical representation of the maze."""
+        logger.info(f"Loading graphical processor. Animated = {self.animated}")
         processor = MazeGraphicalProcessor(
             maze_builder=self.maze_builder, animated=self.animated
         )
+        logger.info("Loading graphical renderer...")
         gui = MazeGraphicalRenderer(
             rows=self.maze_builder.maze.rows,
             cols=self.maze_builder.maze.cols,
             processor=processor,
         )
+        logger.info("Start rendering...")
         gui.run()  # type: ignore[no-untyped-call]
 
 
@@ -121,33 +126,46 @@ class MazeGraphicalProcessor:
 
         return border_points, center_point
 
-    def process_maze(self) -> tuple[list[Point], list[Point], list[Point]]:
-        """Traverse the latest maze version processing graphical info."""
-        cell_border_points = []
-        unvisited_cell_center_points = []
-        current_cell_center_points = []
-
+    def process_maze(self) -> None:
+        """Run the next round of maze processing."""
         if self.animated:
             next(self.maze_generator, None)
 
-        for cell in self.maze.traverse_by_cell():
-            border_points, center_point = self.calculate_cell_points(cell)
-            cell_border_points.extend(border_points)
-
-            if not cell.visited:
-                unvisited_cell_center_points.append(center_point)
-
-            if cell.current:
-                current_cell_center_points.append(center_point)
-
         if self.maze.state == MazeState.READY:
             self.processing = False
+            logger.info("Maze processing finished.")
 
-        return (
-            cell_border_points,
-            unvisited_cell_center_points,
-            current_cell_center_points,
+
+class MazeSprites:
+    """Graphical representation of the maze using sprites."""
+
+    def __init__(self, processor: MazeGraphicalProcessor):
+        self.processor = processor
+        self.sprites = SpriteList()
+        self._create_sprites()
+
+    def _create_sprites(self) -> None:
+        """Create a sprite for each cell in the maze."""
+        logger.info("Calculating primitive coordinates and creating sprites...")
+        for cell in self.processor.maze.traverse_by_cell():
+            border_points, center_point = self.processor.calculate_cell_points(cell)
+            sprite = SpriteSolidColor(
+                CELL_FILL_SIZE, CELL_FILL_SIZE, UNVISITED_CELL_COLOR
+            )
+            sprite.center_x = center_point.x
+            sprite.center_y = center_point.y
+            self.sprites.append(sprite)
+        logger.info("Sprites created.")
+
+    def lookup(self, cell: Cell) -> Sprite:
+        """Find the sprite in the list based on the cell coordinates."""
+        return cast(
+            Sprite, self.sprites[cell.row * self.processor.maze.cols + cell.col]
         )
+
+    def set_color(self, cell: Cell, new_color: Tuple[int, int, int]) -> None:
+        """Lookup the sprite and set the color."""
+        self.lookup(cell).color = new_color
 
 
 class MazeGraphicalRenderer(Window):
@@ -158,6 +176,8 @@ class MazeGraphicalRenderer(Window):
     """
 
     def __init__(self, rows: int, cols: int, processor: MazeGraphicalProcessor):
+        logger.info("Arcade Graphical Engine detected.")
+
         self.processor = processor
 
         width = cols * CELL_SIZE + 2 * EXTERNAL_SIZE
@@ -167,45 +187,21 @@ class MazeGraphicalRenderer(Window):
         super().__init__(width=width, height=height, title=title)
         set_background_color(BACKGROUND_COLOR)
 
-        self.maze_shapes: ShapeElementList[Shape | Any] = ShapeElementList()  # type: ignore[no-untyped-call]
+        self.maze_sprites = MazeSprites(self.processor)
+        self.building_steps = 0
 
     def on_update(self, delta_time: float) -> None:
         """Update objects before rendering."""
         if self.processor.processing:
-            (
-                border_points,
-                unvisited_center_points,
-                current_center_points,
-            ) = self.processor.process_maze()
-            self.maze_shapes = ShapeElementList()  # type: ignore[no-untyped-call]
+            self.processor.process_maze()
 
-            for center in unvisited_center_points:
-                self.maze_shapes.append(
-                    create_rectangle(
-                        center_x=center.x,
-                        center_y=center.y,
-                        width=CELL_FILL_SIZE,
-                        height=CELL_FILL_SIZE,
-                        color=UNVISITED_CELL_COLOR,
-                    )
-                )
+            for cell in self.processor.maze.previous_active_cells:
+                self.maze_sprites.set_color(cell, VISITED_CELL_COLOR)
 
-            for center in current_center_points:
-                self.maze_shapes.append(
-                    create_rectangle(
-                        center_x=center.x,
-                        center_y=center.y,
-                        width=CELL_FILL_SIZE,
-                        height=CELL_FILL_SIZE,
-                        color=CURRENT_CELL_COLOR,
-                    )
-                )
-
-            self.maze_shapes.append(
-                create_lines(point_list=border_points, color=BORDER_COLOR)
-            )
+            for cell in self.processor.maze.active_cells:
+                self.maze_sprites.set_color(cell, ACTIVE_CELL_COLOR)
 
     def on_draw(self) -> None:
         """Render all objects for the active window."""
         self.clear()
-        self.maze_shapes.draw()  # type: ignore[no-untyped-call]
+        self.maze_sprites.sprites.draw()  # type: ignore[no-untyped-call]

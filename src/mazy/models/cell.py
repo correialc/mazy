@@ -61,7 +61,7 @@ class Cell:
     role: Role = Role.NONE
     visited: bool = False
     solution: bool = False
-    current: bool = False
+    active: bool = False
     content: Optional[str] = None
     neighbors: dict[Direction, Neighbor] = field(default_factory=dict)
 

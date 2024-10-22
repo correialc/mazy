@@ -14,6 +14,7 @@ from mazy.viewers.base_viewer import MazeViewer
 from mazy.viewers.graphical_viewer import MazeGraphicalViewer
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(module)s: %(message)s")
 
 DEFAULT_NUMBER_OF_ROWS = 3
 DEFAULT_NUMBER_OF_COLS = 4
@@ -61,7 +62,7 @@ def validate_args(args: Optional[Sequence[str]] = None) -> Namespace:
 def make_maze(args: Namespace) -> None:
     """Make the maze and output results."""
     builder: MazeBuilder
-    print(f"Loading {args.builder} builder...")
+    logger.info(f"Loading {args.builder} builder...")
     match args.builder:
         case BuilderAlgorithm.BINARY_TREE.value:
             builder = BinaryTreeBuilder(args.rows, args.cols)
@@ -71,10 +72,10 @@ def make_maze(args: Namespace) -> None:
             builder = DummyBuilder(args.rows, args.cols)
         case _:
             raise InvalidBuilder(f"Invalid builder: {args.builder}")
-    print(f"{builder.name.capitalize()} builder loaded.")
+    logger.info(f"{builder.name.capitalize()} builder loaded.")
 
     viewer: MazeViewer
-    print(f"Loading {args.viewer} viewer...")
+    logger.info(f"Loading {args.viewer} viewer...")
     match args.viewer:
         case "text":
             viewer = MazeTextViewer(builder)
@@ -83,13 +84,12 @@ def make_maze(args: Namespace) -> None:
         case _:
             raise InvalidViewer(f"Invalid viewer: {args.viewer}")
 
-    print(f"{args.viewer.capitalize()} viewer loaded.")
+    logger.info(f"{args.viewer.capitalize()} viewer loaded.")
 
-    print(
+    logger.info(
         f"Building a {args.rows}x{args.cols} maze " f"using {args.builder} algorithm..."
     )
 
-    print("Maze created.")
     viewer.show_maze()
 
 

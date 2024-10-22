@@ -52,16 +52,42 @@ def test_dummy_builder_build_maze_does_not_change_cell_solution_fields() -> None
         assert cell.content is None
 
 
-def test_binary_tree_builder_build_maze_update_current_cell() -> None:
-    """Ensure the builder updates the current cell while building the maze."""
+def test_dummy_builder_build_maze_update_active_cell() -> None:
+    """Ensure the builder updates the active cells while building the maze."""
     builder = DummyBuilder(rows=3, cols=5)
+    assert builder.maze[0, 0].active is True
+    assert len(builder.maze.previous_active_cells) == 0
+    assert len(builder.maze.active_cells) == 1
+    assert builder.maze[0, 0] in builder.maze.active_cells
+
     maze_generator = builder.build_maze()
 
     maze = next(maze_generator)
-    assert maze[0, 0].current is True
-    assert maze.current_cell == maze[0, 0]
+    assert maze[0, 0].active is True
+    assert len(maze.active_cells) == 1
+    assert len(maze.previous_active_cells) == 1
+    assert builder.maze[0, 0] in builder.maze.previous_active_cells
+    assert builder.maze[0, 0] in builder.maze.active_cells
 
     maze = next(maze_generator)
-    assert maze[0, 0].current is False
-    assert maze.current_cell != maze[0, 0]
-    assert maze.current_cell.current is True
+    assert maze[0, 0].active is False
+    assert maze[0, 1].active is True
+    assert len(maze.active_cells) == 1
+    assert len(maze.previous_active_cells) == 1
+    assert builder.maze[0, 0] in builder.maze.previous_active_cells
+    assert builder.maze[0, 0] not in builder.maze.active_cells
+    assert builder.maze[0, 1] not in builder.maze.previous_active_cells
+    assert builder.maze[0, 1] in builder.maze.active_cells
+
+    maze = next(maze_generator)
+    assert maze[0, 0].active is False
+    assert maze[0, 1].active is False
+    assert maze[0, 2].active is True
+    assert len(maze.active_cells) == 1
+    assert len(maze.previous_active_cells) == 1
+    assert builder.maze[0, 0] not in builder.maze.previous_active_cells
+    assert builder.maze[0, 0] not in builder.maze.active_cells
+    assert builder.maze[0, 1] in builder.maze.previous_active_cells
+    assert builder.maze[0, 1] not in builder.maze.active_cells
+    assert builder.maze[0, 2] not in builder.maze.previous_active_cells
+    assert builder.maze[0, 2] in builder.maze.active_cells

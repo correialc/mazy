@@ -1,6 +1,6 @@
 """Models related to a maze."""
 from enum import Enum
-from typing import Generator, Sequence
+from typing import Generator, Sequence, Set
 
 from mazy.models.cell import Cell, Direction, Role
 
@@ -17,11 +17,14 @@ class Maze:
 
     def __init__(self, rows: int, cols: int):
         self.state = MazeState.BUILDING
+        self.building_steps = 0
         self.rows = rows
         self.cols = cols
         self.cells: Sequence[Sequence[Cell]] = [
             [Cell(row, col) for col in range(cols)] for row in range(rows)
         ]
+        self.previous_active_cells: Set[Cell] = set()
+        self.active_cells: Set[Cell] = set()
 
         self._set_entrance_and_exit()
         self._registry_neighbors()
@@ -33,8 +36,8 @@ class Maze:
     def _set_entrance_and_exit(self) -> None:
         """Set entrance and exit cells."""
         self[0, 0].role = Role.ENTRANCE
-        self[0, 0].current = True
-        self.current_cell = self[0, 0]
+        self[0, 0].active = True
+        self.active_cells.add(self[0, 0])
         self[self.rows - 1, self.cols - 1].role = Role.EXIT
 
     def _registry_neighbors(self) -> None:
